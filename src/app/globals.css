@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Roboto, Arial, Helvetica, sans-serif;
 }
 
 @layer base {
@@ -85,4 +85,8 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.cm-editor {
+  min-height: calc(100dvh - 5.5rem);
 }

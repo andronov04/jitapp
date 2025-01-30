@@ -28,6 +28,7 @@ import equal from 'fast-deep-equal';
 import { Button } from '@/components/ui/button';
 import { ArrowUpIcon, PaperclipIcon } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
+import { PreviewAttachment } from '@/components/chat/preview-attachment';
 
 function PureMultimodalInput({
   chatId,
@@ -209,25 +210,25 @@ function PureMultimodalInput({
         tabIndex={-1}
       />
 
-      {/*{(attachments.length > 0 || uploadQueue.length > 0) && (*/}
-      {/*  <div className="flex flex-row gap-2 overflow-x-scroll items-end">*/}
-      {/*    {attachments.map((attachment) => (*/}
-      {/*      <PreviewAttachment key={attachment.url} attachment={attachment} />*/}
-      {/*    ))}*/}
+      {(attachments.length > 0 || uploadQueue.length > 0) && (
+        <div className="flex flex-row gap-2 overflow-x-scroll items-end">
+          {attachments.map((attachment) => (
+            <PreviewAttachment key={attachment.url} attachment={attachment} />
+          ))}
 
-      {/*    {uploadQueue.map((filename) => (*/}
-      {/*      <PreviewAttachment*/}
-      {/*        key={filename}*/}
-      {/*        attachment={{*/}
-      {/*          url: '',*/}
-      {/*          name: filename,*/}
-      {/*          contentType: '',*/}
-      {/*        }}*/}
-      {/*        isUploading={true}*/}
-      {/*      />*/}
-      {/*    ))}*/}
-      {/*  </div>*/}
-      {/*)}*/}
+          {uploadQueue.map((filename) => (
+            <PreviewAttachment
+              key={filename}
+              attachment={{
+                url: '',
+                name: filename,
+                contentType: '',
+              }}
+              isUploading={true}
+            />
+          ))}
+        </div>
+      )}
 
       <Textarea
         ref={textareaRef}
@@ -253,8 +254,11 @@ function PureMultimodalInput({
         }}
       />
 
-      <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start">
+      <div className="absolute bottom-0 p-2 w-fit flex gap-2 flex-row justify-start items-center">
         <AttachmentsButton fileInputRef={fileInputRef} isLoading={isLoading} />
+        <div className="bg-background rounded-md px-2 py-1 text-xs text-white">
+          GPT-4o
+        </div>
       </div>
 
       <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end">

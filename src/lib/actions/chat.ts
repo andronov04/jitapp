@@ -38,7 +38,10 @@ export async function updateChatVisiblityById({
   visibility: 'private' | 'public';
 }) {
   const supabaseAdmin = createAdminClient();
-  await supabaseAdmin.from('chat_model').update({ visibility }).eq('id', chatId);
+  await supabaseAdmin
+    .from('chat_model')
+    .update({ visibility })
+    .eq('id', chatId);
 }
 
 export async function updateChatVisibility({

@@ -1,7 +1,6 @@
-import {auth} from "@/lib/supabase/auth";
-import {getDocumentsById, saveDocument} from "@/lib/actions/document";
-import {BlockKind} from "@/components/chat/block";
-
+import { auth } from '@/lib/supabase/auth';
+import { getDocumentsById, saveDocument } from '@/lib/actions/document';
+import { BlockKind } from '@/components/chat/block';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

@@ -139,7 +139,8 @@ function PureBlock({
     [],
   );
 
-  const { open: isSidebarOpen } = useSidebar();
+  // const { open: isSidebarOpen } = useSidebar();
+  const isSidebarOpen = false;
 
   useEffect(() => {
     if (documents && documents.length > 0) {
@@ -480,24 +481,11 @@ function PureBlock({
                   'mx-auto max-w-[600px]': block.kind === 'text',
                 })}
               >
-                {isDocumentsFetching && !block.content ? (
-                  <DocumentSkeleton blockKind={block.kind} />
-                ) : block.kind === 'code' ? (
-                  <CodeEditor
-                    content={
-                      isCurrentVersion
-                        ? block.content
-                        : getDocumentContentById(currentVersionIndex)
-                    }
-                    isCurrentVersion={isCurrentVersion}
-                    currentVersionIndex={currentVersionIndex}
-                    suggestions={suggestions ?? []}
-                    status={block.status}
-                    saveContent={saveContent}
-                  />
-                ) : block.kind === 'text' ? (
-                  mode === 'edit' ? (
-                    <Editor
+                {
+                  isDocumentsFetching && !block.content ? (
+                    <DocumentSkeleton blockKind={block.kind} />
+                  ) : block.kind === 'code' ? (
+                    <CodeEditor
                       content={
                         isCurrentVersion
                           ? block.content
@@ -505,32 +493,47 @@ function PureBlock({
                       }
                       isCurrentVersion={isCurrentVersion}
                       currentVersionIndex={currentVersionIndex}
+                      suggestions={suggestions ?? []}
                       status={block.status}
                       saveContent={saveContent}
-                      suggestions={isCurrentVersion ? (suggestions ?? []) : []}
                     />
-                  ) : (
-                    <DiffView
-                      oldContent={getDocumentContentById(
-                        currentVersionIndex - 1,
-                      )}
-                      newContent={getDocumentContentById(currentVersionIndex)}
-                    />
-                  )
-                ) : block.kind ===
-                  'image' ? null : null
-                // <ImageEditor
-                //   title={block.title}
-                //   content={
-                //     isCurrentVersion
-                //       ? block.content
-                //       : getDocumentContentById(currentVersionIndex)
-                //   }
-                //   isCurrentVersion={isCurrentVersion}
-                //   currentVersionIndex={currentVersionIndex}
-                //   status={block.status}
-                //   isInline={false}
-                // />
+                  ) : block.kind === 'text' ? (
+                    mode === 'edit' ? (
+                      <Editor
+                        content={
+                          isCurrentVersion
+                            ? block.content
+                            : getDocumentContentById(currentVersionIndex)
+                        }
+                        isCurrentVersion={isCurrentVersion}
+                        currentVersionIndex={currentVersionIndex}
+                        status={block.status}
+                        saveContent={saveContent}
+                        suggestions={
+                          isCurrentVersion ? (suggestions ?? []) : []
+                        }
+                      />
+                    ) : (
+                      <DiffView
+                        oldContent={getDocumentContentById(
+                          currentVersionIndex - 1,
+                        )}
+                        newContent={getDocumentContentById(currentVersionIndex)}
+                      />
+                    )
+                  ) : block.kind === 'image' ? null : null
+                  // <ImageEditor
+                  //   title={block.title}
+                  //   content={
+                  //     isCurrentVersion
+                  //       ? block.content
+                  //       : getDocumentContentById(currentVersionIndex)
+                  //   }
+                  //   isCurrentVersion={isCurrentVersion}
+                  //   currentVersionIndex={currentVersionIndex}
+                  //   status={block.status}
+                  //   isInline={false}
+                  // />
                 }
 
                 {suggestions && suggestions.length > 0 ? (

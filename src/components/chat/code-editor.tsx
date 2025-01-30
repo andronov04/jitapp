@@ -89,11 +89,9 @@ function PureCodeEditor({ content, saveContent, status }: EditorProps) {
     }
   }, [content, status]);
 
+  //  pb-[calc(80dvh)]
   return (
-    <div
-      className="relative not-prose w-full pb-[calc(80dvh)] text-sm"
-      ref={containerRef}
-    />
+    <div className="relative not-prose w-full text-sm" ref={containerRef} />
   );
 }
 

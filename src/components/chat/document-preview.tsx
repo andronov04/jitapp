@@ -248,24 +248,24 @@ const DocumentContent = ({ document }: { document: any }) => {
 
   return (
     <div className={containerClassName}>
-      {document.kind === 'text' ? (
-        <Editor {...commonProps} />
-      ) : document.kind === 'code' ? (
-        <div className="flex flex-1 relative w-full">
-          <div className="absolute inset-0">
-            <CodeEditor {...commonProps} />
+      {
+        document.kind === 'text' ? (
+          <Editor {...commonProps} />
+        ) : document.kind === 'code' ? (
+          <div className="flex flex-1 relative w-full">
+            <div className="absolute inset-0">
+              <CodeEditor {...commonProps} />
+            </div>
           </div>
-        </div>
-      ) : document.kind ===
-        'image' ? null : null
-      // <ImageEditor
-      //   title={document.title}
-      //   content={document.content ?? ''}
-      //   isCurrentVersion={true}
-      //   currentVersionIndex={0}
-      //   status={block.status}
-      //   isInline={true}
-      // />
+        ) : document.kind === 'image' ? null : null
+        // <ImageEditor
+        //   title={document.title}
+        //   content={document.content ?? ''}
+        //   isCurrentVersion={true}
+        //   currentVersionIndex={0}
+        //   status={block.status}
+        //   isInline={true}
+        // />
       }
     </div>
   );

@@ -2,10 +2,10 @@
 
 import type { Attachment, Message } from 'ai';
 import { useChat } from 'ai/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 
-import { fetcher } from '@/lib/utils';
+import { fetcher, generateId } from '@/lib/utils';
 
 import { Block } from './block';
 import { MultimodalInput } from './multimodal-input';
@@ -18,16 +18,19 @@ export function Chat({
   id,
   initialMessages,
   selectedModelId,
+  isCreating: isCreatingProp,
   selectedVisibilityType,
   isReadonly,
 }: {
   id: string;
   initialMessages: Array<Message>;
   selectedModelId: string;
+  isCreating?: boolean;
   selectedVisibilityType: VisibilityType;
   isReadonly: boolean;
 }) {
   const { mutate } = useSWRConfig();
+  const [isCreating, setIsCreating] = useState(isCreatingProp || false);
 
   const {
     messages,
@@ -45,7 +48,11 @@ export function Chat({
     initialMessages,
     experimental_throttle: 100,
     onFinish: () => {
-      mutate('/api/history');
+      // mutate('/api/history');
+      setIsCreating(false);
+    },
+    onError: () => {
+      setIsCreating(false);
     },
   });
 
@@ -55,14 +62,33 @@ export function Chat({
   // );
   const votes: any = [];
 
+  useEffect(() => {
+    // const prompt = (window as any).jitPrompt;
+    // console.log('initChat', (window as any).jitPrompt);
+    // if (prompt) {
+    //   setMessages((messages) => messages.concat([{ id: generateId(), content: prompt, role: 'user' }]));
+    //   handleSubmit(undefined, {
+    //     allowEmptySubmit: true,
+    //   });
+    // }
+    // (window as any).jitPrompt = '';
+    // // window.history.replaceState({}, '', `/chat/${generateId()}`);
+  }, []);
+
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
   const isBlockVisible = useBlockSelector((state) => state.isVisible);
 
   return (
     <>
-      <div className="flex flex-col min-w-0 h-dvh bg-background">
+      <div
+        style={{
+          height: 'calc(100dvh - 2.5rem)',
+        }}
+        className="flex flex-col text-sm min-w-0 h-dvh bg-background"
+      >
         <ChatHeader
           chatId={id}
+          isCreating={isCreating}
           selectedModelId={selectedModelId}
           selectedVisibilityType={selectedVisibilityType}
           isReadonly={isReadonly}

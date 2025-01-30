@@ -78,9 +78,7 @@ export async function POST(request: Request) {
   const userMessageId = generateId();
 
   await saveMessages({
-    messages: [
-      { ...userMessage, id: userMessageId, chat_id: id },
-    ],
+    messages: [{ ...userMessage, id: userMessageId, chat_id: id }],
   });
 
   return createDataStreamResponse({

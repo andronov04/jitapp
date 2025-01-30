@@ -16,11 +16,14 @@ import { DocumentPreview } from './document-preview';
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Markdown } from '@/components/chat/markdown';
 import { SparklesIcon } from 'lucide-react';
+import { PreviewAttachment } from '@/components/chat/preview-attachment';
+import { MessageActions } from '@/components/chat/message-actions';
 
 const PurePreviewMessage = ({
   chatId,
@@ -48,7 +51,7 @@ const PurePreviewMessage = ({
   return (
     <AnimatePresence>
       <motion.div
-        className="w-full mx-auto max-w-3xl px-4 group/message"
+        className="w-full mx-auto max-w-3xl px-2 group/message"
         initial={{ y: 5, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         data-role={message.role}
@@ -71,34 +74,36 @@ const PurePreviewMessage = ({
           )}
 
           <div className="flex flex-col gap-2 w-full">
-            {/*{message.experimental_attachments && (*/}
-            {/*  <div className="flex flex-row justify-end gap-2">*/}
-            {/*    {message.experimental_attachments.map((attachment) => (*/}
-            {/*      <PreviewAttachment*/}
-            {/*        key={attachment.url}*/}
-            {/*        attachment={attachment}*/}
-            {/*      />*/}
-            {/*    ))}*/}
-            {/*  </div>*/}
-            {/*)}*/}
+            {message.experimental_attachments && (
+              <div className="flex flex-row justify-end gap-2">
+                {message.experimental_attachments.map((attachment) => (
+                  <PreviewAttachment
+                    key={attachment.url}
+                    attachment={attachment}
+                  />
+                ))}
+              </div>
+            )}
 
             {message.content && mode === 'view' && (
               <div className="flex flex-row gap-2 items-start">
                 {message.role === 'user' && !isReadonly && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="px-2 h-fit rounded-full text-muted-foreground opacity-0 group-hover/message:opacity-100"
-                        onClick={() => {
-                          setMode('edit');
-                        }}
-                      >
-                        {/*<PencilEditIcon />*/}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Edit message</TooltipContent>
-                  </Tooltip>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="px-2 h-fit rounded-full text-muted-foreground opacity-0 group-hover/message:opacity-100"
+                          onClick={() => {
+                            setMode('edit');
+                          }}
+                        >
+                          {/*<PencilEditIcon />*/}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Edit message</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 )}
 
                 <div
@@ -190,14 +195,19 @@ const PurePreviewMessage = ({
               </div>
             )}
 
-            {/*{!isReadonly && (*/}
-            {/*  <MessageActions*/}
-            {/*    key={`action-${message.id}`}*/}
-            {/*    chatId={chatId}*/}
-            {/*    message={message}*/}
-            {/*    vote={vote}*/}
-            {/*    isLoading={isLoading}*/}
-            {/*  />*/}
+            {!isReadonly && (
+              <MessageActions
+                key={`action-${message.id}`}
+                chatId={chatId}
+                message={message}
+                vote={vote}
+                isLoading={isLoading}
+              />
+            )}
+            {/*{message.role === 'assistant' && (*/}
+            {/*  <div className={"text-muted-foreground text-xs"}>*/}
+            {/*  gpt-4o*/}
+            {/*  </div>*/}
             {/*)}*/}
           </div>
         </div>
@@ -229,7 +239,7 @@ export const ThinkingMessage = () => {
 
   return (
     <motion.div
-      className="w-full mx-auto max-w-3xl px-4 group/message "
+      className="w-full mx-auto max-w-3xl px-2 group/message "
       initial={{ y: 5, opacity: 0 }}
       animate={{ y: 0, opacity: 1, transition: { delay: 1 } }}
       data-role={role}
