@@ -39,7 +39,7 @@ function PureChatHeader({
   const { width: windowWidth } = useWindowSize();
 
   return (
-    <header className="flex border-b h-12 sticky top-0 bg-background py-1.5 items-center px-2 md:px-2 gap-2">
+    <header className="flex h-12 sticky top-0 bg-background py-1.5 items-center px-2 md:px-2 gap-2">
       {/*<SidebarToggle />*/}
       <div className="flex items-center justify-between gap-2">
         {/*<div>*/}

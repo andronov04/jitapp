@@ -17,19 +17,19 @@ export function ContainerView({
 }: { initialMessages: any; isCreating?: boolean; chatId: string }) {
   return (
     <div className="min-h-screen flex flex-col flex-1">
-      <header className="flex border-b h-10 bg-background py-1.5 items-center px-2 md:px-2 gap-2">
+      <header className="flex h-10 bg-background py-1.5 items-center px-2 md:px-2 gap-2">
         <LogoBlock size={30} />
-        <Button variant="secondary" size="sm">
-          <PlusIcon />
-          New
-        </Button>
+        {/*<Button variant="secondary" size="sm">*/}
+        {/*  <PlusIcon />*/}
+        {/*  New*/}
+        {/*</Button>*/}
       </header>
       <div className="flex-grow flex">
         <div
           style={{
             flex: '35 1 0px',
           }}
-          className="border-r collapsed:md:min-w-[28rem] collapsed:lg:min-w-[32rem] h-full md:min-w-[18rem] lg:min-w-[24rem] xl:min-w-[32rem]"
+          className="collapsed:md:min-w-[28rem] collapsed:lg:min-w-[32rem] h-full md:min-w-[18rem] lg:min-w-[24rem] xl:min-w-[32rem]"
         >
           <div>
             <Chat
