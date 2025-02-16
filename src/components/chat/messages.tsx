@@ -3,12 +3,14 @@ import { PreviewMessage, ThinkingMessage } from './message';
 import { useScrollToBottom } from './use-scroll-to-bottom';
 import { memo } from 'react';
 import equal from 'fast-deep-equal';
+import {IMessageStore} from "@/lib/store/message";
+import {observer} from "mobx-react-lite";
 
 interface MessagesProps {
   chatId: string;
   isLoading: boolean;
   votes: Array<any> | undefined;
-  messages: Array<Message>;
+  messages: Array<IMessageStore>;
   setMessages: (
     messages: Message[] | ((messages: Message[]) => Message[]),
   ) => void;
@@ -19,7 +21,7 @@ interface MessagesProps {
   isBlockVisible: boolean;
 }
 
-function PureMessages({
+export const Messages = observer(({
   chatId,
   isLoading,
   votes,
@@ -27,7 +29,7 @@ function PureMessages({
   setMessages,
   reload,
   isReadonly,
-}: MessagesProps) {
+}: MessagesProps) => {
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
 
@@ -39,25 +41,29 @@ function PureMessages({
       {/* {messages.length === 0 && <Overview />} */}
 
       {messages.map((message, index) => (
-        <PreviewMessage
-          key={message.id}
-          chatId={chatId}
-          message={message}
-          isLoading={isLoading && messages.length - 1 === index}
-          vote={
-            votes
-              ? votes.find((vote) => vote.messageId === message.id)
-              : undefined
-          }
-          setMessages={setMessages}
-          reload={reload}
-          isReadonly={isReadonly}
-        />
+        <div key={message.id}>
+          <p>{message.id}</p>
+          {/*<pre>{JSON.stringify(message.content ?? {})}</pre>*/}
+          <PreviewMessage
+            key={message.id}
+            chatId={chatId}
+            message={message as any}
+            isLoading={isLoading && messages.length - 1 === index}
+            vote={
+              votes
+                ? votes.find((vote) => vote.messageId === message.id)
+                : undefined
+            }
+            setMessages={setMessages}
+            reload={reload}
+            isReadonly={isReadonly}
+          />
+        </div>
       ))}
 
-      {isLoading &&
-        messages.length > 0 &&
-        messages[messages.length - 1].role === 'user' && <ThinkingMessage />}
+      {/*{isLoading &&*/}
+      {/*  messages.length > 0 &&*/}
+      {/*  messages[messages.length - 1].role === 'user' && <ThinkingMessage />}*/}
 
       <div
         ref={messagesEndRef}
@@ -65,16 +71,17 @@ function PureMessages({
       />
     </div>
   );
-}
+})
 
-export const Messages = memo(PureMessages, (prevProps, nextProps) => {
-  if (prevProps.isBlockVisible && nextProps.isBlockVisible) return true;
 
-  if (prevProps.isLoading !== nextProps.isLoading) return false;
-  if (prevProps.isLoading && nextProps.isLoading) return false;
-  if (prevProps.messages.length !== nextProps.messages.length) return false;
-  if (!equal(prevProps.messages, nextProps.messages)) return false;
-  if (!equal(prevProps.votes, nextProps.votes)) return false;
-
-  return true;
-});
+// export const Messages = memo(PureMessages, (prevProps, nextProps) => {
+//   if (prevProps.isBlockVisible && nextProps.isBlockVisible) return true;
+//
+//   if (prevProps.isLoading !== nextProps.isLoading) return false;
+//   if (prevProps.isLoading && nextProps.isLoading) return false;
+//   if (prevProps.messages.length !== nextProps.messages.length) return false;
+//   if (!equal(prevProps.messages, nextProps.messages)) return false;
+//   if (!equal(prevProps.votes, nextProps.votes)) return false;
+//
+//   return true;
+// });

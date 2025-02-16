@@ -5,7 +5,7 @@ import { useChat } from 'ai/react';
 import { useEffect, useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 
-import { fetcher, generateId } from '@/lib/utils';
+import { generateId } from '@/lib/utils';
 
 import { Block } from './block';
 import { MultimodalInput } from './multimodal-input';
@@ -13,6 +13,7 @@ import { VisibilityType } from './visibility-selector';
 import { useBlockSelector } from '@/hooks/use-block';
 import { ChatHeader } from '@/components/chat/chat-header';
 import { Messages } from '@/components/chat/messages';
+import {useMessageParser} from "@/hooks/useMessageParser";
 
 export function Chat({
   id,
@@ -46,7 +47,9 @@ export function Chat({
     id,
     body: { id, modelId: selectedModelId },
     initialMessages,
+    streamProtocol: "data",
     experimental_throttle: 100,
+    // sendExtraMessageFields: true,
     onFinish: () => {
       // mutate('/api/history');
       setIsCreating(false);
@@ -55,6 +58,8 @@ export function Chat({
       setIsCreating(false);
     },
   });
+  const { parsedMessages, parseMessages } = useMessageParser();
+
 
   // const { data: votes } = useSWR<Array<Vote>>(
   //   `/api/vote?chatId=${id}`,
@@ -63,16 +68,25 @@ export function Chat({
   const votes: any = [];
 
   useEffect(() => {
-    // const prompt = (window as any).jitPrompt;
-    // console.log('initChat', (window as any).jitPrompt);
-    // if (prompt) {
-    //   setMessages((messages) => messages.concat([{ id: generateId(), content: prompt, role: 'user' }]));
-    //   handleSubmit(undefined, {
-    //     allowEmptySubmit: true,
-    //   });
+    parseMessages(messages, isLoading);
+    // console.log("parsedMessages", parsedMessages);
+
+    // if (messages.length > initialMessages.length) {
+    //   storeMessageHistory(messages).catch((error) => toast.error(error.message));
     // }
-    // (window as any).jitPrompt = '';
-    // // window.history.replaceState({}, '', `/chat/${generateId()}`);
+  }, [messages, isLoading, parseMessages]);
+
+  useEffect(() => {
+    const prompt = (window as any).jitPrompt;
+    console.log('initChat', (window as any).jitPrompt);
+    if (prompt) {
+      setMessages((messages) => messages.concat([{ id: generateId(), content: prompt, role: 'user' }]));
+      handleSubmit(undefined, {
+        allowEmptySubmit: true,
+      });
+    }
+    (window as any).jitPrompt = '';
+    window.history.replaceState({}, '', `/chat/${generateId()}`);
   }, []);
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
@@ -98,7 +112,16 @@ export function Chat({
           chatId={id}
           isLoading={isLoading}
           votes={votes}
-          messages={messages}
+          messages={messages.map((message, i) => {
+            if (message.role === 'user') {
+              return message;
+            }
+
+            return {
+              ...message,
+              content: parsedMessages[i] || '',
+            };
+          })}
           setMessages={setMessages}
           reload={reload}
           isReadonly={isReadonly}

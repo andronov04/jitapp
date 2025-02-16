@@ -44,8 +44,16 @@ export function DataStreamHandler({ id }: { id: string }) {
   useEffect(() => {
     if (!dataStream?.length) return;
 
+    // dataStream.forEach((delta: DataStreamDelta) => {
+    //   // console.log("delta", delta);
+    //   // if (delta?.type === "text-delta") {
+    //   //   delta.content = delta.content.slice(4);
+    //   // }
+    // });
+
     const newDeltas = dataStream.slice(lastProcessedIndex.current + 1);
     lastProcessedIndex.current = dataStream.length - 1;
+
 
     (newDeltas as DataStreamDelta[]).forEach((delta: DataStreamDelta) => {
       if (delta.type === 'user-message-id') {
@@ -81,9 +89,11 @@ export function DataStreamHandler({ id }: { id: string }) {
             };
 
           case 'text-delta':
+            const id = delta.content.slice(0, 4)
             return {
               ...draftBlock,
-              content: draftBlock.content + (delta.content as string),
+              content: draftBlock.content + (delta.content?.slice(4) as string),
+              documentId: id,
               isVisible:
                 draftBlock.status === 'streaming' &&
                 draftBlock.content.length > 400 &&
@@ -94,9 +104,11 @@ export function DataStreamHandler({ id }: { id: string }) {
             };
 
           case 'code-delta':
+            const ids = delta.content.slice(0, 3)
             return {
               ...draftBlock,
-              content: delta.content as string,
+              content: (delta.content?.slice(3) as string),
+              documentId: ids,
               isVisible:
                 draftBlock.status === 'streaming' &&
                 draftBlock.content.length > 300 &&

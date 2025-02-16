@@ -1,0 +1,21 @@
+name: jitapp
+services:
+  db_jitapp:
+    image: postgres:16-alpine
+    restart: always
+    ports:
+      - 6548:5432
+    environment:
+      - POSTGRES_DB=jitappdb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    networks:
+      - jitapp_net
+    volumes:
+      - db_jitapp_data:/var/lib/postgresql/data
+
+networks:
+  jitapp_net:
+
+volumes:
+  db_jitapp_data: {}

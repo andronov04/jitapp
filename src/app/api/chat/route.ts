@@ -23,6 +23,7 @@ import { systemPrompt } from '@/lib/ai/prompts';
 import { customModel } from '@/lib/ai';
 import { deleteChatById, getChatById, saveChat } from '@/lib/actions/chat';
 import { saveMessages } from '@/lib/actions/message';
+import {getSystemPrompt} from "@/lib/llm/llm/prompts";
 
 export const maxDuration = 60;
 
@@ -82,67 +83,135 @@ export async function POST(request: Request) {
   });
 
   return createDataStreamResponse({
-    execute: (dataStream) => {
+    execute: async (dataStream) => {
       dataStream.writeData({
         type: 'user-message-id',
         content: userMessageId,
       });
 
-      const result = streamText({
-        model: customModel(model.apiIdentifier),
-        system: systemPrompt,
-        messages: coreMessages,
-        maxSteps: 5,
-        experimental_activeTools: allTools,
-        experimental_transform: smoothStream({ chunking: 'word' }),
-        tools: {
-          getWeather,
-          createDocument: createDocument({ session, dataStream, model }),
-          updateDocument: updateDocument({ session, dataStream, model }),
-          requestSuggestions: requestSuggestions({
-            session,
-            dataStream,
-            model,
-          }),
-        },
-        onFinish: async ({ response }) => {
-          if (session?.id) {
-            try {
-              const responseMessagesWithoutIncompleteToolCalls =
-                sanitizeResponseMessages(response.messages);
+      const msg1 = "123";
+      const msg2 = "456";
 
-              await saveMessages({
-                messages: responseMessagesWithoutIncompleteToolCalls.map(
-                  (message) => {
-                    const messageId = generateId();
-
-                    if (message.role === 'assistant') {
-                      dataStream.writeMessageAnnotation({
-                        messageIdFromServer: messageId,
-                      });
-                    }
-
-                    return {
-                      id: messageId,
-                      chat_id: id,
-                      role: message.role,
-                      content: message.content,
-                    };
-                  },
-                ),
-              });
-            } catch (error) {
-              console.error('Failed to save chat');
+      // Создаем промисы для обоих стримов
+      const streamPromise1 = new Promise((resolve) => {
+        const result1 = streamText({
+          model: customModel(model.apiIdentifier),
+          system: getSystemPrompt("/home/user/"),
+          messages: [
+            {
+              role: 'user',
+              content: 'simple hello world',
             }
-          }
-        },
-        experimental_telemetry: {
-          isEnabled: true,
-          functionId: 'stream-text',
-        },
+          ],
+          maxSteps: 1,
+          experimental_transform: smoothStream({ chunking: 'word' }),
+          onChunk: async ({chunk}) => {
+            chunk.textDelta = `<jitMsg data-id="${msg1}">${chunk.textDelta}</jitMsg>`
+            // chunk.textDelta = `${msg1}-${chunk.textDelta}` //JSON.stringify({ "msgId": 1, text: chunk.textDelta })
+            // chunk.args = { msgId: msg1 }
+            console.log("chunk", chunk);
+          },
+          onFinish: async ({ response }) => {
+            // if (session?.id) {
+            //   try {
+            //     const responseMessagesWithoutIncompleteToolCalls =
+            //       sanitizeResponseMessages(response.messages);
+            //
+            //     await saveMessages({
+            //       messages: responseMessagesWithoutIncompleteToolCalls.map(
+            //         (message) => {
+            //           const messageId = generateId();
+            //           if (message.role === 'assistant') {
+            //             dataStream.writeMessageAnnotation({
+            //               messageIdFromServer: messageId,
+            //             });
+            //           }
+            //           console.log("onFinish 1", message, messageId);
+            //           return {
+            //             id: messageId,
+            //             chat_id: id,
+            //             role: message.role,
+            //             content: message.content,
+            //           };
+            //         },
+            //       ),
+            //     });
+            //   } catch (error) {
+            //     console.error('Failed to save chat');
+            //   }
+            // }
+            resolve(true);
+          },
+          experimental_telemetry: {
+            isEnabled: true,
+            functionId: 'stream-text',
+          },
+        });
+        result1.mergeIntoDataStream(dataStream);
       });
 
-      result.mergeIntoDataStream(dataStream);
+      // const streamPromise2 = new Promise((resolve) => {
+      //   const result2 = streamText({
+      //     model: customModel(model.apiIdentifier),
+      //     system: getSystemPrompt("/home/user/"),
+      //     messages: [
+      //       {
+      //         role: 'system',
+      //         content: 'You are a helpful assistant.',
+      //       },
+      //       {
+      //         role: 'user',
+      //         content: 'write hello world in JavaScript',
+      //       }
+      //     ],
+      //     maxSteps: 1,
+      //     experimental_transform: smoothStream({ chunking: 'word' }),
+      //     onChunk: async ({chunk}) => {
+      //       chunk.textDelta = `<jitMsg data-id="${msg2}">${chunk.textDelta}</jitMsg>` //JSON.stringify({ "msgId": 2, text: chunk.textDelta })//
+      //       // chunk.args = { msgId: msg2} //JSON.stringify({ "msgId": 2, text: chunk.textDelta })
+      //       // console.log("chunk", chunk);
+      //     },
+      //     onFinish: async ({ response }) => {
+      //       // if (session?.id) {
+      //       //   try {
+      //       //     const responseMessagesWithoutIncompleteToolCalls =
+      //       //       sanitizeResponseMessages(response.messages);
+      //       //
+      //       //     await saveMessages({
+      //       //       messages: responseMessagesWithoutIncompleteToolCalls.map(
+      //       //         (message) => {
+      //       //           const messageId = generateId();
+      //       //           if (message.role === 'assistant') {
+      //       //             dataStream.writeMessageAnnotation({
+      //       //               messageIdFromServer: messageId,
+      //       //             });
+      //       //           }
+      //       //           console.log("onFinish 2", message, messageId);
+      //       //           return {
+      //       //             id: messageId,
+      //       //             chat_id: id,
+      //       //             role: message.role,
+      //       //             content: message.content,
+      //       //           };
+      //       //         },
+      //       //       ),
+      //       //     });
+      //       //   } catch (error) {
+      //       //     console.error('Failed to save chat');
+      //       //   }
+      //       // }
+      //       resolve(true);
+      //     },
+      //     experimental_telemetry: {
+      //       isEnabled: true,
+      //       functionId: 'stream-text',
+      //     },
+      //   });
+      //   result2.mergeIntoDataStream(dataStream);
+      // });
+
+      // Ждем завершения обоих стримов
+      await Promise.all([streamPromise1]); //streamPromise2
     },
   });
 }

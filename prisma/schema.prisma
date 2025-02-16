@@ -1,0 +1,95 @@
+// -----------------------------------------
+// 1) Генераторы кода и источник данных
+// -----------------------------------------
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// -----------------------------------------
+// 2) Дополнительные Enum'ы
+// -----------------------------------------
+enum BoxMode {
+  BASIC
+  COMPARISON
+}
+
+enum MessageRole {
+  user
+  assistant
+}
+
+enum MessageKind {
+  user
+  ai
+  aigroup
+  usercommit
+  // Добавляйте, если нужно больше значений
+}
+
+// -----------------------------------------
+// 3) Основные модели с UUID
+// -----------------------------------------
+
+model Model {
+  id        String   @id @default(uuid()) // UUID вместо Int
+  name      String
+  provider  String? // Например: "OpenAI", "Custom"...
+  params    Json?
+  createdAt DateTime @default(now())
+
+  Message   Message[]
+}
+
+model Generator {
+  id          String   @id @default(uuid()) // UUID вместо Int
+  name        String
+  description String?
+  params      Json?
+  createdAt   DateTime @default(now())
+}
+
+model Box {
+  id          String   @id @default(uuid()) // UUID вместо Int
+  name        String
+  data        Json
+  description String?
+  createdAt   DateTime @default(now())
+
+  messages    Message[]
+}
+
+model Message {
+  id String @id @default(uuid()) // UUID вместо Int
+
+  // Привязка к Box (общий чат внутри Box)
+  boxId String
+  box   Box @relation(fields: [boxId], references: [id], onDelete: Cascade)
+
+  modelId String?
+  model   Model? @relation(fields: [modelId], references: [id])
+
+  // Для иерархии сообщений (цепочка)
+  parentMessageId String?
+  parentMessage   Message?  @relation("MessageToParent", fields: [parentMessageId], references: [id])
+  children        Message[] @relation("MessageToParent")
+
+  // Роли и тип (kind)
+  role MessageRole
+  kind MessageKind
+
+  data Json
+  content   Json
+  createdAt DateTime @default(now())
+}
+
+model State {
+  id String @id @default(uuid()) // UUID вместо Int
+
+  data Json
+  createdAt DateTime @default(now())
+}

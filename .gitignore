@@ -42,3 +42,6 @@ next-env.d.ts
 
 .pnpm-store
 .idea
+sandbox
+info.txt
+output

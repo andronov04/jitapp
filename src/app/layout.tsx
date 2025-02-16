@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
 import './globals.css';
-import { cn } from '@/lib/utils';
+import {cn, generateUuid} from '@/lib/utils';
 import { ThemeProvider } from 'next-themes';
 import { Toaster } from '@/components/ui/sonner';
+import React from "react";
+import {StoreWrapper} from "@/lib/providers/store-provider";
+import {stateData} from "@/examplestate";
 
 const roboto = Roboto({
   subsets: ['latin'],
@@ -40,6 +43,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // { currentUser, models, authLoaded: true }
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -62,7 +66,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Toaster />
-          {children}
+          <StoreWrapper box={{ id: "none" }} app={{...stateData.app, currentBox: {...stateData.app.currentBox, id: generateUuid() }}}>
+            {children}
+          </StoreWrapper>
         </ThemeProvider>
       </body>
     </html>

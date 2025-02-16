@@ -9,7 +9,7 @@ import {
   useRef,
 } from 'react';
 import { BlockKind, UIBlock } from './block';
-import { cn, fetcher } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { InlineDocumentSkeleton } from './document-skeleton';
 import useSWR from 'swr';
 import { Editor } from './editor';
@@ -35,7 +35,7 @@ export function DocumentPreview({
 
   const { data: documents, isLoading: isDocumentsFetching } = useSWR<
     Array<any>
-  >(result ? `/api/document?id=${result.id}` : null, fetcher);
+  >(result ? `/api/document?id=${result.id}` : null, null);
 
   const previewDocument = useMemo(() => documents?.[0], [documents]);
   const hitboxRef = useRef<HTMLDivElement>(null);

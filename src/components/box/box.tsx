@@ -7,8 +7,16 @@ import {BoxIcon, EyeIcon, HeartIcon, MessageCircleIcon} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import millify from "millify";
 import LogoBlock from "@/components/common/logo-block";
+import {useStore} from "@/lib/store";
+import {observer} from "mobx-react-lite";
+import {generateId} from "ai";
 
-export function Box() {
+const Box = observer(({ data }: { data?: any }) => {
+  console.log(data);
+  const { app } = useStore();
+  // app.setCurrentBox(box);
+
+  // box?.updateRepo(_repo);
   const [chatWidth, setChatWidth] = useState(33); // Default 30%
   const isDragging = useRef(false);
   const containerRef = useRef(null);
@@ -43,7 +51,7 @@ export function Box() {
       <header className="h-12 sticky top-0 bg-background z-10 border-b flex justify-between items-center px-4 shadow-sm">
         <div className="flex items-center justify-between gap-2">
           <LogoBlock />
-          <BoxIcon className="text-muted-foreground" /> <div className="text-sm">Create bank account landing page</div>
+          <BoxIcon className="text-muted-foreground" /> <div className="text-sm">{data.name}</div>
           <Button variant="ghost" size="sm" className="justify-start  shadow-none">
             <HeartIcon className="h-4 w-4"/>
             <span className="text-xs text-gray-400">{millify(2344)}</span>
@@ -70,7 +78,19 @@ export function Box() {
           className="relative overflow-hidden z-10"
           style={{width: `${chatWidth}%`}}
         >
-          <ChatView />
+          <ChatView
+            id={generateId()}
+            selectedModelId={"gpt-4o-mini"}
+            isCreating={false}
+            selectedVisibilityType={data.visibilityType}
+            isReadonly={false}
+            initialMessages={app.currentBox?.messages?.map(m => {
+              return {
+                id: m.id,
+                content: m.content, //children compare ?
+                role: m.role,
+              };
+            }) as any} />
         </section>
 
         <div
@@ -82,11 +102,14 @@ export function Box() {
           className=" flex-grow"
           style={{width: `${100 - chatWidth}%`}}
         >
-          <WorkbenchView />
+          <div className="flex flex-col p-4 space-y-4 ">
+            {app.currentBox?.workbenches?.map(item => <WorkbenchView key={item.id} workbench={item}/>)}
+            {/*<WorkbenchView workbenches={data.workbenches ?? []}/>*/}
+          </div>
         </section>
       </div>
     </div>
-  );
-}
+);
+});
 
 export default Box;

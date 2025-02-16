@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { nanoid } from 'nanoid';
+import { v4 as uuidv4 } from 'uuid';
 import {
   CoreAssistantMessage,
   CoreMessage,
@@ -55,8 +56,19 @@ export const generateId = () => {
   return nanoid().replace(/[^a-zA-Z0-9]/g, '');
 };
 
-export const fetcher = async (url: string) => {
-  const res = await fetch(url);
+export const generateUuid = () => {
+  return uuidv4();
+};
+
+
+export const fetcher = async (url: string, body: any): Promise<{ data: any; error: ApplicationError | null }> => {
+  const res = await fetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
 
   if (!res.ok) {
     const error = new Error(
@@ -66,10 +78,17 @@ export const fetcher = async (url: string) => {
     error.info = await res.json();
     error.status = res.status;
 
-    throw error;
+    // throw error;
+    return {
+      data: null,
+      error
+    };
   }
 
-  return res.json();
+  return {
+    data: await res.json(),
+    error: null,
+  };
 };
 
 function addToolMessageToChat({

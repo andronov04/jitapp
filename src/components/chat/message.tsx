@@ -3,7 +3,7 @@
 import type { ChatRequestOptions, Message } from 'ai';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
-import { memo, useMemo, useState } from 'react';
+import {memo, useEffect, useMemo, useState} from 'react';
 
 import { DocumentToolCall, DocumentToolResult } from './document';
 // import { MessageActions } from './message-actions';
@@ -24,6 +24,9 @@ import { Markdown } from '@/components/chat/markdown';
 import { SparklesIcon } from 'lucide-react';
 import { PreviewAttachment } from '@/components/chat/preview-attachment';
 import { MessageActions } from '@/components/chat/message-actions';
+import {PreMarkdown} from "@/components/chat/pre-markdown";
+import {IMessageStore} from "@/lib/store/message";
+import MessageChildren from "@/components/chat/message-children";
 
 const PurePreviewMessage = ({
   chatId,
@@ -35,7 +38,7 @@ const PurePreviewMessage = ({
   isReadonly,
 }: {
   chatId: string;
-  message: Message;
+  message: IMessageStore;
   vote: any | undefined;
   isLoading: boolean;
   setMessages: (
@@ -48,6 +51,11 @@ const PurePreviewMessage = ({
 }) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
 
+  useEffect(() => {
+    console.log("message", message.status, message);
+  }, [message.status]);
+
+  // console.log("message", message);
   return (
     <AnimatePresence>
       <motion.div
@@ -56,6 +64,7 @@ const PurePreviewMessage = ({
         animate={{ y: 0, opacity: 1 }}
         data-role={message.role}
       >
+        {message.status}
         <div
           className={cn(
             'flex gap-4 w-full group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl',
@@ -74,37 +83,37 @@ const PurePreviewMessage = ({
           )}
 
           <div className="flex flex-col gap-2 w-full">
-            {message.experimental_attachments && (
-              <div className="flex flex-row justify-end gap-2">
-                {message.experimental_attachments.map((attachment) => (
-                  <PreviewAttachment
-                    key={attachment.url}
-                    attachment={attachment}
-                  />
-                ))}
-              </div>
-            )}
+            {/*{message.experimental_attachments && (*/}
+            {/*  <div className="flex flex-row justify-end gap-2">*/}
+            {/*    {message.experimental_attachments.map((attachment) => (*/}
+            {/*      <PreviewAttachment*/}
+            {/*        key={attachment.url}*/}
+            {/*        attachment={attachment}*/}
+            {/*      />*/}
+            {/*    ))}*/}
+            {/*  </div>*/}
+            {/*)}*/}
 
             {message.content && mode === 'view' && (
               <div className="flex flex-row gap-2 items-start">
-                {message.role === 'user' && !isReadonly && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          className="px-2 h-fit rounded-full text-muted-foreground opacity-0 group-hover/message:opacity-100"
-                          onClick={() => {
-                            setMode('edit');
-                          }}
-                        >
-                          {/*<PencilEditIcon />*/}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Edit message</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
+                {/*{message.role === 'user' && !isReadonly && (*/}
+                {/*  <TooltipProvider>*/}
+                {/*    <Tooltip>*/}
+                {/*      <TooltipTrigger asChild>*/}
+                {/*        <Button*/}
+                {/*          variant="ghost"*/}
+                {/*          className="px-2 h-fit rounded-full text-muted-foreground opacity-0 group-hover/message:opacity-100"*/}
+                {/*          onClick={() => {*/}
+                {/*            setMode('edit');*/}
+                {/*          }}*/}
+                {/*        >*/}
+                {/*          /!*<PencilEditIcon />*!/*/}
+                {/*        </Button>*/}
+                {/*      </TooltipTrigger>*/}
+                {/*      <TooltipContent>Edit message</TooltipContent>*/}
+                {/*    </Tooltip>*/}
+                {/*  </TooltipProvider>*/}
+                {/*)}*/}
 
                 <div
                   className={cn('flex flex-col gap-4', {
@@ -112,98 +121,37 @@ const PurePreviewMessage = ({
                       message.role === 'user',
                   })}
                 >
-                  <Markdown>{message.content as string}</Markdown>
+                  <PreMarkdown content={message.content as string} />
                 </div>
               </div>
             )}
 
-            {message.content && mode === 'edit' && (
-              <div className="flex flex-row gap-2 items-start">
-                <div className="size-8" />
+            {message.children.map(msg => <MessageChildren key={msg.id} message={msg} />)}
 
-                <MessageEditor
-                  key={message.id}
-                  message={message}
-                  setMode={setMode}
-                  setMessages={setMessages}
-                  reload={reload}
-                />
-              </div>
-            )}
+            {/*{message.content && mode === 'edit' && (*/}
+            {/*  <div className="flex flex-row gap-2 items-start">*/}
+            {/*    <div className="size-8" />*/}
 
-            {message.toolInvocations && message.toolInvocations.length > 0 && (
-              <div className="flex flex-col gap-4">
-                {message.toolInvocations.map((toolInvocation) => {
-                  const { toolName, toolCallId, state, args } = toolInvocation;
+            {/*    <MessageEditor*/}
+            {/*      key={message.id}*/}
+            {/*      message={message as any}*/}
+            {/*      setMode={setMode}*/}
+            {/*      setMessages={setMessages}*/}
+            {/*      reload={reload}*/}
+            {/*    />*/}
+            {/*  </div>*/}
+            {/*)}*/}
 
-                  if (state === 'result') {
-                    const { result } = toolInvocation;
 
-                    return (
-                      <div key={toolCallId}>
-                        {toolName ===
-                        'getWeather' ? // <Weather weatherAtLocation={result} />
-                        null : toolName === 'createDocument' ? (
-                          <DocumentPreview
-                            isReadonly={isReadonly}
-                            result={result}
-                          />
-                        ) : toolName === 'updateDocument' ? (
-                          <DocumentToolResult
-                            type="update"
-                            result={result}
-                            isReadonly={isReadonly}
-                          />
-                        ) : toolName === 'requestSuggestions' ? (
-                          <DocumentToolResult
-                            type="request-suggestions"
-                            result={result}
-                            isReadonly={isReadonly}
-                          />
-                        ) : (
-                          <pre>{JSON.stringify(result, null, 2)}</pre>
-                        )}
-                      </div>
-                    );
-                  }
-                  return (
-                    <div
-                      key={toolCallId}
-                      className={cx({
-                        skeleton: ['getWeather'].includes(toolName),
-                      })}
-                    >
-                      {toolName === 'getWeather' ? null : toolName ===
-                        'createDocument' ? (
-                        <DocumentPreview isReadonly={isReadonly} args={args} />
-                      ) : toolName === 'updateDocument' ? (
-                        <DocumentToolCall
-                          type="update"
-                          args={args}
-                          isReadonly={isReadonly}
-                        />
-                      ) : toolName === 'requestSuggestions' ? (
-                        <DocumentToolCall
-                          type="request-suggestions"
-                          args={args}
-                          isReadonly={isReadonly}
-                        />
-                      ) : null}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {!isReadonly && (
-              <MessageActions
-                key={`action-${message.id}`}
-                chatId={chatId}
-                message={message}
-                vote={vote}
-                isLoading={isLoading}
-              />
-            )}
+            {/*{!isReadonly && (*/}
+            {/*  <MessageActions*/}
+            {/*    key={`action-${message.id}`}*/}
+            {/*    chatId={chatId}*/}
+            {/*    message={message}*/}
+            {/*    vote={vote}*/}
+            {/*    isLoading={isLoading}*/}
+            {/*  />*/}
+            {/*)}*/}
             {/*{message.role === 'assistant' && (*/}
             {/*  <div className={"text-muted-foreground text-xs"}>*/}
             {/*  gpt-4o*/}
@@ -221,13 +169,6 @@ export const PreviewMessage = memo(
   (prevProps, nextProps) => {
     if (prevProps.isLoading !== nextProps.isLoading) return false;
     if (prevProps.message.content !== nextProps.message.content) return false;
-    if (
-      !equal(
-        prevProps.message.toolInvocations,
-        nextProps.message.toolInvocations,
-      )
-    )
-      return false;
     if (!equal(prevProps.vote, nextProps.vote)) return false;
 
     return true;

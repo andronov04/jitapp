@@ -1,4 +1,4 @@
-import {Box} from "@/components/box/box";
+import Box from "@/components/box/box";
 
 export const metadata = {
   title: 'Box',
@@ -8,7 +8,7 @@ export const metadata = {
 export default async function Page() {
   return (
     <>
-      <Box />
+      <Box data={{}} />
     </>
   );
 }
