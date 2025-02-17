@@ -81,6 +81,27 @@ export async function GET(request: Request) {
             }
           },
         });
+        if (messageId) {
+          const msg = await prisma.message.findUnique({
+            where: {
+              id: messageId,
+            },
+          });
+          console.log("msg", msg);
+          if (msg) {
+            await prisma.message.update({
+              where: {
+                id: messageId,
+              },
+              data: {
+                status: "ready",
+                content: contentText
+              },
+            });
+            // originalText and fitText
+          }
+        }
+
 
         // resolve("Stream finished"); // Разрешаем промис после завершения потока
       },

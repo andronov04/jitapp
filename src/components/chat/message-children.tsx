@@ -12,14 +12,14 @@ const MessageChildren = observer(({
 }) => {
 
   useEffect(() => {
-    if (message.status === 'created') {
+    if (message.status === 'created' && message.role === 'assistant') {
       message.generateStreaming(message.streamCallback);
     }
   }, [message.status]);
 
   return (
     <div className="text-green-700">
-      <PreMarkdown content={message.content}/>
+      <PreMarkdown content={message.fullContent}/>
       {message.status === 'created' && (
         <div>
           Created

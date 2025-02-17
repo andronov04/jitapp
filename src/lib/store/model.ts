@@ -2,7 +2,9 @@ import {Instance, SnapshotIn, SnapshotOut, types} from "mobx-state-tree";
 
 export const ModelStore = types
   .model({
-    id: types.identifierNumber,
+    id: types.identifier,
+    name: types.string,
+    path: types.optional(types.string, ''),
   })
   .views((self) => ({
     // get getFiles() {

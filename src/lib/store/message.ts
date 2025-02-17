@@ -107,6 +107,10 @@ export const MessageStore = types
     get app() {
       return getRoot(self) as any;
     },
+    get fullContent() {
+      // TODO fix it, once use, before create
+      return self.status === "ready" ? createMessageParser().parse(self.id, self.content) : self.content;
+    },
   }))
   .actions((self) => {
     // addChild(message: Instance<typeof MessageStore>) {

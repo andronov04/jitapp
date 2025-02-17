@@ -1,6 +1,3 @@
-// -----------------------------------------
-// 1) Генераторы кода и источник данных
-// -----------------------------------------
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,86 +7,67 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// -----------------------------------------
-// 2) Дополнительные Enum'ы
-// -----------------------------------------
-enum BoxMode {
-  BASIC
-  COMPARISON
-}
-
-enum MessageRole {
-  user
-  assistant
-}
-
-enum MessageKind {
-  user
-  ai
-  aigroup
-  usercommit
-  // Добавляйте, если нужно больше значений
-}
-
-// -----------------------------------------
-// 3) Основные модели с UUID
-// -----------------------------------------
-
-model Model {
-  id        String   @id @default(uuid()) // UUID вместо Int
-  name      String
-  provider  String? // Например: "OpenAI", "Custom"...
-  params    Json?
-  createdAt DateTime @default(now())
-
-  Message   Message[]
-}
-
-model Generator {
-  id          String   @id @default(uuid()) // UUID вместо Int
-  name        String
-  description String?
-  params      Json?
-  createdAt   DateTime @default(now())
+model User {
+  id        String    @id @default(uuid())
+  username  String
+  email     String
+  createdAt DateTime  @default(now())
+  boxes     Box[]
+  messages  Message[]
 }
 
 model Box {
-  id          String   @id @default(uuid()) // UUID вместо Int
+  id          String    @id @default(uuid())
   name        String
   data        Json
+  slug        String    @unique
   description String?
-  createdAt   DateTime @default(now())
-
+  createdAt   DateTime  @default(now())
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages    Message[]
 }
 
 model Message {
-  id String @id @default(uuid()) // UUID вместо Int
-
-  // Привязка к Box (общий чат внутри Box)
-  boxId String
-  box   Box @relation(fields: [boxId], references: [id], onDelete: Cascade)
-
-  modelId String?
-  model   Model? @relation(fields: [modelId], references: [id])
-
-  // Для иерархии сообщений (цепочка)
+  id              String     @id @default(uuid())
+  boxId           String
+  modelId         String?
+  generatorId     String?
   parentMessageId String?
-  parentMessage   Message?  @relation("MessageToParent", fields: [parentMessageId], references: [id])
-  children        Message[] @relation("MessageToParent")
+  userId          String?
+  role            String
+  kind            String
+  status          String
+  content         String
+  createdAt       DateTime   @default(now())
+  box             Box        @relation(fields: [boxId], references: [id], onDelete: Cascade)
+  generator       Generator? @relation(fields: [generatorId], references: [id])
+  model           Model?     @relation(fields: [modelId], references: [id])
+  parentMessage   Message?   @relation("MessageToParent", fields: [parentMessageId], references: [id])
+  children        Message[]  @relation("MessageToParent")
+  user            User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
 
-  // Роли и тип (kind)
-  role MessageRole
-  kind MessageKind
+model Model {
+  id        String    @id @default(uuid())
+  name      String
+  provider  String?
+  params    Json?
+  createdAt DateTime  @default(now())
+  messages  Message[]
+}
 
-  data Json
-  content   Json
-  createdAt DateTime @default(now())
+model Generator {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  params      Json?
+  createdAt   DateTime  @default(now())
+  messages    Message[]
 }
 
 model State {
-  id String @id @default(uuid()) // UUID вместо Int
-
-  data Json
+  id        String   @id @default(uuid())
+  data      Json
   createdAt DateTime @default(now())
 }

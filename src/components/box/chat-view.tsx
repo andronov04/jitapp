@@ -104,7 +104,7 @@ const ChatView = observer(({
     });
     app.currentBox?.addMessage({
       "id": generateUuid(),
-      "role": "aigroup",
+      "role": "group",
       "content": "",
       status: 'created',
       "children": [
@@ -142,7 +142,6 @@ const ChatView = observer(({
       }}
       className="flex flex-col text-sm min-w-0 h-dvh bg-background"
     >
-      m{app.currentBox?.messages?.length}
       <ChatHeader
         chatId={id}
         isCreating={false}

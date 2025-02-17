@@ -42,7 +42,7 @@ export const Messages = observer(({
 
       {messages.map((message, index) => (
         <div key={message.id}>
-          <p>{message.id}</p>
+          {/*<p>{message.id}</p>*/}
           {/*<pre>{JSON.stringify(message.content ?? {})}</pre>*/}
           <PreviewMessage
             key={message.id}

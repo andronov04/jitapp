@@ -1,6 +1,6 @@
 import {NextResponse} from "next/server";
-import prisma from "@/prisma";
 import {generateId} from "@/lib/utils";
+import prisma from "@/prisma";
 
 export const maxDuration = 60;
 
@@ -12,6 +12,8 @@ export async function POST(request: Request) {
     messages,
   }: { input: string; boxId: string; messages: any[] } = await request.json();
   console.log("POST", input, boxId, messages);
+  const generatorId = "6c73628c-11bf-4a64-a525-bda25dc0f58e";
+  const modelId = "aa3ef862-79f9-4008-ac3f-26a91ae8982b";
 
   const box = await prisma.box.create({
     data: {
@@ -19,12 +21,8 @@ export async function POST(request: Request) {
       name: "Box 1",
       description: "Box 1 description",
       createdAt: new Date(),
-      data: {
-        id: boxId,
-        name: "Box 1",
-        description: "Box 1 description",
-        slug: generateId(),
-      },
+      slug: generateId(),
+      data: {},
     },
   })
 
@@ -44,17 +42,9 @@ export async function POST(request: Request) {
           role: "user" as any,
           kind: "user" as any,
           content: input,
+          status: "created",
           createdAt: new Date(),
           boxId: boxId,
-          data: {
-            id: message.id,
-            role: "user" as any,
-            kind: "user" as any,
-            content: input,
-            status: "created",
-            createdAt: new Date(),
-            boxId: boxId,
-          }
         },
       });
       newMessages.push({
@@ -66,20 +56,12 @@ export async function POST(request: Request) {
       const parentMessage = await prisma.message.create({
         data: {
           id: message.id,
-          role: "assistant" as any,
-          kind: "aigroup" as any,
+          role: message.role as any,
+          kind: "group",
           content: "",
+          status: "created",
           createdAt: new Date(),
           boxId: boxId,
-          data: {
-            id: message.id,
-            role: message.role as any,
-            kind: "aigroup",
-            content: message.content,
-            status: "created",
-            createdAt: new Date(),
-            boxId: boxId,
-          }
         },
       });
       await prisma.message.createMany({
@@ -89,19 +71,12 @@ export async function POST(request: Request) {
           // role: child.role as any,
           kind: "ai",
           content: "",
+          generatorId,
+          modelId,
           createdAt: new Date(),
           boxId: boxId,
           parentMessageId: parentMessage.id,
-          data: {
-            id: child.id,
-            role: child.role as any,
-            kind: "ai",
-            content: child.content,
-            status: "created",
-            createdAt: new Date(),
-            boxId: boxId,
-            parentMessageId: message.id,
-          }
+          status: "created",
         }))
       });
       newMessages.push({

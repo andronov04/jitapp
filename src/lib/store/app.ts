@@ -1,6 +1,7 @@
 import { applySnapshot, Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree";
 import { values } from "mobx";
 import {BoxStore} from "@/lib/store/box";
+import {ModelStore} from "@/lib/store/model";
 
 let appStore: IAppStore | undefined;
 
@@ -45,6 +46,7 @@ const UserModel = types
 const AppStore = types
   .model({
     currentBox: types.maybeNull(BoxStore),
+    models: types.array(ModelStore),
     // light: false,
     // authLoaded: false,
     // modalState: types.optional(types.string, ""),
@@ -81,10 +83,12 @@ const AppStore = types
     // },
   }))
   .actions((self) => {
-    const setCurrentBox = (box: any) => {
-      if (!box) return;
+
+    const updateCurrentBox = (box: any) => {
+      console.log("updateCurrentBox", box);
       self.currentBox = box;
     };
+
     // const afterCreate = () => {
     //   // TODO load from database
     //   // self.layouts.put({ id: 4, views: ["web", "code"] });
@@ -112,7 +116,7 @@ const AppStore = types
     // const getModelById = (id: number) => {
     //   return self.models.find((model) => model.id === id);
     // };
-    return { setCurrentBox };
+    return { updateCurrentBox };
   });
 
 export type IAppStore = Instance<typeof AppStore>;

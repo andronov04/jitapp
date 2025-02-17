@@ -23,7 +23,6 @@ export const NewMarkdown = memo(({ children, html = false, limitedMarkdown = fal
   const components = useMemo(() => {
     return {
       div: ({ className, children, node, ...props }) => {
-        console.log("classNamsse", className);
         if (className?.includes('__jitProject__')) {
           const messageId = node?.properties.dataMessageId as string;
 

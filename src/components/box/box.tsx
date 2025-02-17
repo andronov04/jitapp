@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import {useState, useRef, useCallback, useEffect} from 'react';
 import ChatView from "@/components/box/chat-view";
 import WorkbenchView from "@/components/box/workbench-view";
 import {BoxIcon, EyeIcon, HeartIcon, MessageCircleIcon} from "lucide-react";
@@ -14,12 +14,21 @@ import {generateId} from "ai";
 const Box = observer(({ data }: { data?: any }) => {
   console.log(data);
   const { app } = useStore();
-  // app.setCurrentBox(box);
+  // data?.box && app.updateCurrentBox(data.box);
 
   // box?.updateRepo(_repo);
   const [chatWidth, setChatWidth] = useState(33); // Default 30%
   const isDragging = useRef(false);
   const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (data?.box) {
+      app.updateCurrentBox(data.box);
+      if (data.messageState) {
+        app.currentBox?.updateState("91454ed6-a6db-4ffb-8a5f-8b0d2998c384",data.messageState);
+      }
+    }
+  }, []);
 
   const handleMouseDown = useCallback((e: any) => {
     isDragging.current = true;

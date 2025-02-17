@@ -64,7 +64,6 @@ const PurePreviewMessage = ({
         animate={{ y: 0, opacity: 1 }}
         data-role={message.role}
       >
-        {message.status}
         <div
           className={cn(
             'flex gap-4 w-full group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl',
@@ -94,7 +93,7 @@ const PurePreviewMessage = ({
             {/*  </div>*/}
             {/*)}*/}
 
-            {message.content && mode === 'view' && (
+            {message.content && (
               <div className="flex flex-row gap-2 items-start">
                 {/*{message.role === 'user' && !isReadonly && (*/}
                 {/*  <TooltipProvider>*/}

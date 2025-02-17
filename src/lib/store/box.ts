@@ -10,6 +10,8 @@ let boxStore: IBoxStore | undefined;
 export const BoxStore = types
   .model({
     id: types.identifier,
+    slug: types.optional(types.string, ""),
+    empty: types.optional(types.boolean, true),
     isProcessing: types.optional(types.boolean, false), // for
     name: types.optional(types.string, ""),
     workbenches: types.array(WorkbenchStore),

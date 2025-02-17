@@ -7,6 +7,7 @@ import { Toaster } from '@/components/ui/sonner';
 import React from "react";
 import {StoreWrapper} from "@/lib/providers/store-provider";
 import {stateData} from "@/examplestate";
+import {getModels} from "@/lib/actions/model";
 
 const roboto = Roboto({
   subsets: ['latin'],
@@ -38,12 +39,16 @@ const THEME_COLOR_SCRIPT = `\
   updateThemeColor();
 })();`;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  params: Promise<{ bid?: string; id?: string }>;
 }>) {
   // { currentUser, models, authLoaded: true }
+  // getModels();
+  const models = await getModels();
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -66,7 +71,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Toaster />
-          <StoreWrapper box={{ id: "none" }} app={{...stateData.app, currentBox: {...stateData.app.currentBox, id: generateUuid() }}}>
+          <StoreWrapper app={{...stateData.app, models, currentBox: {...stateData.app.currentBox, id: generateUuid() }}}>
             {children}
           </StoreWrapper>
         </ThemeProvider>
