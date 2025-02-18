@@ -13,7 +13,7 @@ import { VisibilityType } from './visibility-selector';
 import { useBlockSelector } from '@/hooks/use-block';
 import { ChatHeader } from '@/components/chat/chat-header';
 import { Messages } from '@/components/chat/messages';
-import {useMessageParser} from "@/hooks/useMessageParser";
+import { useMessageParser } from '@/hooks/useMessageParser';
 
 export function Chat({
   id,
@@ -47,7 +47,7 @@ export function Chat({
     id,
     body: { id, modelId: selectedModelId },
     initialMessages,
-    streamProtocol: "data",
+    streamProtocol: 'data',
     experimental_throttle: 100,
     // sendExtraMessageFields: true,
     onFinish: () => {
@@ -59,7 +59,6 @@ export function Chat({
     },
   });
   const { parsedMessages, parseMessages } = useMessageParser();
-
 
   // const { data: votes } = useSWR<Array<Vote>>(
   //   `/api/vote?chatId=${id}`,
@@ -80,7 +79,9 @@ export function Chat({
     const prompt = (window as any).jitPrompt;
     console.log('initChat', (window as any).jitPrompt);
     if (prompt) {
-      setMessages((messages) => messages.concat([{ id: generateId(), content: prompt, role: 'user' }]));
+      setMessages((messages) =>
+        messages.concat([{ id: generateId(), content: prompt, role: 'user' }]),
+      );
       handleSubmit(undefined, {
         allowEmptySubmit: true,
       });

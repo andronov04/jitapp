@@ -1,52 +1,61 @@
-import { applySnapshot, Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree";
-import { values } from "mobx";
-import {BoxStore} from "@/lib/store/box";
-import {ModelStore} from "@/lib/store/model";
+import {
+  applySnapshot,
+  Instance,
+  SnapshotIn,
+  SnapshotOut,
+  types,
+} from 'mobx-state-tree';
+import { values } from 'mobx';
+import { BoxStore } from '@/lib/store/box';
+import { ModelStore } from '@/lib/store/model';
+import { IUserStore, UserStore } from '@/lib/store/user';
 
 let appStore: IAppStore | undefined;
 
-const UserModel = types
-  .model({
-    id: types.identifier,
-    avatar: types.maybeNull(types.string),
-    name: types.maybeNull(types.string),
-    username: types.string,
-    email: types.string,
-    plan: types.optional(types.string, "free"),
-    credits: types.optional(types.number, 0),
-    requestedPlan: types.optional(types.boolean, false),
-    role: types.optional(
-      types.model({
-        id: types.number,
-        name: types.maybeNull(types.string),
-      }),
-      {
-        id: 2,
-        name: "user",
-      },
-    ),
-    status: types.optional(
-      types.model({
-        id: types.number,
-        name: types.maybeNull(types.string),
-      }),
-      {
-        id: 1,
-        name: "active",
-      },
-    ),
-  })
-  .actions((self) => {
-    const updateRequestedPlan = (val: boolean) => {
-      self.requestedPlan = val;
-    };
-    return { updateRequestedPlan };
-  });
+// const UserModel = types
+//   .model({
+//     id: types.identifier,
+//     avatar: types.maybeNull(types.string),
+//     name: types.maybeNull(types.string),
+//     username: types.string,
+//     email: types.string,
+//     plan: types.optional(types.string, "free"),
+//     credits: types.optional(types.number, 0),
+//     requestedPlan: types.optional(types.boolean, false),
+//     role: types.optional(
+//       types.model({
+//         id: types.number,
+//         name: types.maybeNull(types.string),
+//       }),
+//       {
+//         id: 2,
+//         name: "user",
+//       },
+//     ),
+//     status: types.optional(
+//       types.model({
+//         id: types.number,
+//         name: types.maybeNull(types.string),
+//       }),
+//       {
+//         id: 1,
+//         name: "active",
+//       },
+//     ),
+//   })
+//   .actions((self) => {
+//     const updateRequestedPlan = (val: boolean) => {
+//       self.requestedPlan = val;
+//     };
+//     return { updateRequestedPlan };
+//   });
 
 const AppStore = types
   .model({
     currentBox: types.maybeNull(BoxStore),
     models: types.array(ModelStore),
+    users: types.array(UserStore),
+    currentUser: types.safeReference(UserStore),
     // light: false,
     // authLoaded: false,
     // modalState: types.optional(types.string, ""),
@@ -83,9 +92,11 @@ const AppStore = types
     // },
   }))
   .actions((self) => {
+    const addOrUpdateUser = (userData: IUserStore) => {
+      self.users.push(userData); //, либо через `applySnapshot`, либо MST-utility like detach/put
+    };
 
     const updateCurrentBox = (box: any) => {
-      console.log("updateCurrentBox", box);
       self.currentBox = box;
     };
 
@@ -116,7 +127,7 @@ const AppStore = types
     // const getModelById = (id: number) => {
     //   return self.models.find((model) => model.id === id);
     // };
-    return { updateCurrentBox };
+    return { updateCurrentBox, addOrUpdateUser };
   });
 
 export type IAppStore = Instance<typeof AppStore>;
@@ -132,20 +143,18 @@ export function initializeAppStore(snapshot: IAppStoreSnapshotIn) {
     applySnapshot(_store, snapshot);
   }
   // For SSG and SSR always create a new store
-  if (typeof window === "undefined") return _store;
+  if (typeof window === 'undefined') return _store;
   // Create the store once in the client
   if (!appStore) appStore = _store;
 
-  if (typeof window !== "undefined") {
+  if (typeof window !== 'undefined') {
     (window as any).appStore = _store;
   }
 
   return appStore;
 }
 
-
 export function getAppStore(): IAppStore {
-  console.log('getAppStore', appStore);
   if (!appStore) {
     appStore = initializeAppStore({
       currentBox: null,

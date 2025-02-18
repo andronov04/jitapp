@@ -54,7 +54,6 @@ export function DataStreamHandler({ id }: { id: string }) {
     const newDeltas = dataStream.slice(lastProcessedIndex.current + 1);
     lastProcessedIndex.current = dataStream.length - 1;
 
-
     (newDeltas as DataStreamDelta[]).forEach((delta: DataStreamDelta) => {
       if (delta.type === 'user-message-id') {
         setUserMessageIdFromServer(delta.content as string);
@@ -89,7 +88,7 @@ export function DataStreamHandler({ id }: { id: string }) {
             };
 
           case 'text-delta':
-            const id = delta.content.slice(0, 4)
+            const id = delta.content.slice(0, 4);
             return {
               ...draftBlock,
               content: draftBlock.content + (delta.content?.slice(4) as string),
@@ -104,10 +103,10 @@ export function DataStreamHandler({ id }: { id: string }) {
             };
 
           case 'code-delta':
-            const ids = delta.content.slice(0, 3)
+            const ids = delta.content.slice(0, 3);
             return {
               ...draftBlock,
-              content: (delta.content?.slice(3) as string),
+              content: delta.content?.slice(3) as string,
               documentId: ids,
               isVisible:
                 draftBlock.status === 'streaming' &&

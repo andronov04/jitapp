@@ -3,7 +3,7 @@
 import type { ChatRequestOptions, Message } from 'ai';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
-import {memo, useEffect, useMemo, useState} from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 
 import { DocumentToolCall, DocumentToolResult } from './document';
 // import { MessageActions } from './message-actions';
@@ -24,9 +24,10 @@ import { Markdown } from '@/components/chat/markdown';
 import { SparklesIcon } from 'lucide-react';
 import { PreviewAttachment } from '@/components/chat/preview-attachment';
 import { MessageActions } from '@/components/chat/message-actions';
-import {PreMarkdown} from "@/components/chat/pre-markdown";
-import {IMessageStore} from "@/lib/store/message";
-import MessageChildren from "@/components/chat/message-children";
+import { PreMarkdown } from '@/components/chat/pre-markdown';
+import { IMessageStore } from '@/lib/store/message';
+import MessageChildren from '@/components/chat/message-children';
+import AvatarBlock from '@/components/common/avatar-block';
 
 const PurePreviewMessage = ({
   chatId,
@@ -52,10 +53,10 @@ const PurePreviewMessage = ({
   const [mode, setMode] = useState<'view' | 'edit'>('view');
 
   useEffect(() => {
-    console.log("message", message.status, message);
+    console.log('message', message.status, message);
   }, [message.status]);
 
-  // console.log("message", message);
+  // console.log("message", message); group-data-[role=user]/message:ml-auto
   return (
     <AnimatePresence>
       <motion.div
@@ -66,7 +67,7 @@ const PurePreviewMessage = ({
       >
         <div
           className={cn(
-            'flex gap-4 w-full group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl',
+            'flex gap-4 w-full group-data-[role=user]/message:max-w-2xl',
             {
               'w-full': mode === 'edit',
               'group-data-[role=user]/message:w-fit': mode !== 'edit',
@@ -93,7 +94,7 @@ const PurePreviewMessage = ({
             {/*  </div>*/}
             {/*)}*/}
 
-            {message.content && (
+            {message.content && message.role === 'user' && (
               <div className="flex flex-row gap-2 items-start">
                 {/*{message.role === 'user' && !isReadonly && (*/}
                 {/*  <TooltipProvider>*/}
@@ -113,19 +114,42 @@ const PurePreviewMessage = ({
                 {/*    </Tooltip>*/}
                 {/*  </TooltipProvider>*/}
                 {/*)}*/}
+                <AvatarBlock id={message.id} />
 
                 <div
-                  className={cn('flex flex-col gap-4', {
+                  className={cn('flex flex-col', {
                     'bg-primary text-primary-foreground px-3 py-2 rounded-xl':
                       message.role === 'user',
                   })}
                 >
+                  <div className="text-green-600">@andronov04</div>
                   <PreMarkdown content={message.content as string} />
                 </div>
               </div>
             )}
 
-            {message.children.map(msg => <MessageChildren key={msg.id} message={msg} />)}
+            {message.role === 'group' && (
+              <div className="rounded-xl flex flex-row gap-2 items-start">
+                <AvatarBlock
+                  id={message.id}
+                  customSrc={'https://jit.dev/32x32.png'}
+                />
+                <div
+                  className={cn(
+                    'flex flex-col bg-secondary px-3 py-2 rounded-xl',
+                  )}
+                >
+                  {message.children.map((msg) => (
+                    <div key={msg.id}>
+                      <div className="text-green-600">
+                        {msg.model?.name || 'AI'}
+                      </div>
+                      <MessageChildren key={msg.id} message={msg} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/*{message.content && mode === 'edit' && (*/}
             {/*  <div className="flex flex-row gap-2 items-start">*/}
@@ -140,7 +164,6 @@ const PurePreviewMessage = ({
             {/*    />*/}
             {/*  </div>*/}
             {/*)}*/}
-
 
             {/*{!isReadonly && (*/}
             {/*  <MessageActions*/}

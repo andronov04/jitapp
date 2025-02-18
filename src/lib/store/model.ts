@@ -1,9 +1,10 @@
-import {Instance, SnapshotIn, SnapshotOut, types} from "mobx-state-tree";
+import { Instance, SnapshotIn, SnapshotOut, types } from 'mobx-state-tree';
 
 export const ModelStore = types
   .model({
     id: types.identifier,
     name: types.string,
+    key: types.string,
     path: types.optional(types.string, ''),
   })
   .views((self) => ({
@@ -12,12 +13,11 @@ export const ModelStore = types
     // },
   }))
   .actions((self) => {
-
     // const setIndex = (index: string) => {
     //   self.index = index;
     // };
 
-    return { };
+    return {};
   });
 
 export type IModelStore = Instance<typeof ModelStore>;

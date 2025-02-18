@@ -1,7 +1,6 @@
-import React, {memo} from 'react';
-import {Markdown} from "@/components/chat/markdown";
-import {NewMarkdown} from "@/components/chat/new-markdown";
-
+import React, { memo } from 'react';
+import { Markdown } from '@/components/chat/markdown';
+import { NewMarkdown } from '@/components/chat/new-markdown';
 
 const NonPreMemoizedMarkdown = ({ content }: { content: string }) => {
   let result: string | any[] = content;
@@ -26,9 +25,7 @@ const NonPreMemoizedMarkdown = ({ content }: { content: string }) => {
     );
   }
 
-  return (
-    <NewMarkdown html>{result}</NewMarkdown>
-  );
+  return <NewMarkdown html>{result}</NewMarkdown>;
 };
 
 export const PreMarkdown = memo(

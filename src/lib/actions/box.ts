@@ -1,6 +1,6 @@
 'use server';
 
-import prisma from "@/prisma";
+import prisma from '@/prisma';
 
 export async function getBoxStateBySlug(slug: string) {
   // TODO check some validations
@@ -14,10 +14,10 @@ export async function getBoxStateBySlug(slug: string) {
       slug: true,
       name: true,
       // createdAt: true,
-    }
+    },
   });
   if (!box) {
-    throw new Error("Box not found");
+    throw new Error('Box not found');
   }
   // 2. Get messages
   const selector = {
@@ -27,14 +27,16 @@ export async function getBoxStateBySlug(slug: string) {
     userId: true,
     role: true,
     status: true,
-  }
+    modelId: true,
+    generatorId: true,
+  };
   const messages = await prisma.message.findMany({
     where: {
       boxId: box.id,
       parentMessageId: null,
     },
     orderBy: {
-      createdAt: "asc",
+      createdAt: 'asc',
     },
     select: {
       ...selector,
@@ -44,9 +46,9 @@ export async function getBoxStateBySlug(slug: string) {
           ...selector,
         },
       },
-    }
+    },
   });
-  console.log("messages", messages, box);
+  console.log('messages', messages, box);
 
   return {
     ...box,

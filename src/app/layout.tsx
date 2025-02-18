@@ -1,13 +1,14 @@
 import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
 import './globals.css';
-import {cn, generateUuid} from '@/lib/utils';
+import { cn, generateUuid } from '@/lib/utils';
 import { ThemeProvider } from 'next-themes';
 import { Toaster } from '@/components/ui/sonner';
-import React from "react";
-import {StoreWrapper} from "@/lib/providers/store-provider";
-import {stateData} from "@/examplestate";
-import {getModels} from "@/lib/actions/model";
+import React from 'react';
+import { StoreWrapper } from '@/lib/providers/store-provider';
+import { stateData } from '@/examplestate';
+import { getModels } from '@/lib/actions/model';
+import { ReactScan } from '@/app/ReactScan';
 
 const roboto = Roboto({
   subsets: ['latin'],
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 const LIGHT_THEME_COLOR = 'hsl(0 0% 100%)';
-const DARK_THEME_COLOR = 'hsl(0 0% 13%)'//'hsl(240deg 10% 3.92%)';
+const DARK_THEME_COLOR = 'hsl(0 0% 13%)'; //'hsl(240deg 10% 3.92%)';
 const THEME_COLOR_SCRIPT = `\
 (function() {
   var html = document.documentElement;
@@ -58,6 +59,7 @@ export default async function RootLayout({
           }}
         />
       </head>
+      {/*<ReactScan />*/}
       <body
         className={cn(
           roboto.className,
@@ -71,7 +73,13 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <Toaster />
-          <StoreWrapper app={{...stateData.app, models, currentBox: {...stateData.app.currentBox, id: generateUuid() }}}>
+          <StoreWrapper
+            app={{
+              ...stateData.app,
+              models,
+              currentBox: { ...stateData.app.currentBox, id: generateUuid() },
+            }}
+          >
             {children}
           </StoreWrapper>
         </ThemeProvider>

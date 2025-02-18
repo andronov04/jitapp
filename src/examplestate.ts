@@ -1,9 +1,9 @@
 export const stateData = {
-  "app": {
-    "currentBox": {
-      "id": "slugs",
-      "name": "Box 1",
-      "workbenches": [
+  app: {
+    currentBox: {
+      id: 'slugs',
+      name: 'Box 1',
+      workbenches: [
         // {
         //   "id": 1,
         //   "status": "created",
@@ -19,7 +19,7 @@ export const stateData = {
         //   ]
         // }
       ],
-      "messages": [
+      messages: [
         // {
         //   "id": "box-message-1",
         //   "role": "user",
@@ -46,7 +46,7 @@ export const stateData = {
         //     },
         //   ]
         // },
-      ]
-    }
-  }
-}
+      ],
+    },
+  },
+};

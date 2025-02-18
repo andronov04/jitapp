@@ -1,6 +1,6 @@
 import type { ActionType, FileAction, ShellAction } from './actions';
 import type { BoltArtifactData } from './artifact';
-import {unreachable} from "@/lib/runtime/unreachable";
+import { unreachable } from '@/lib/runtime/unreachable';
 // import { createScopedLogger } from '~/utils/logger';
 // import { unreachable } from '~/utils/unreachable';
 
@@ -10,7 +10,6 @@ const ARTIFACT_ACTION_TAG_OPEN = '<jitFile';
 const ARTIFACT_ACTION_TAG_CLOSE = '</jitFile>';
 
 // const logger = createScopedLogger('MessageParser');
-
 
 export interface ArtifactCallbackData extends BoltArtifactData {
   messageId: string;
@@ -55,14 +54,12 @@ interface MessageState {
 
 export class StreamingMessageParser {
   #messages = new Map<string, MessageState>();
-  content = "";
+  content = '';
+  insideState: any = [];
 
   constructor(private _options: StreamingMessageParserOptions = {}) {}
 
-
-
   parse(messageId: string, input: string) {
-
     let state = this.#messages.get(messageId);
 
     if (!state) {
@@ -118,6 +115,10 @@ export class StreamingMessageParser {
 
               action: currentAction as any,
             });
+            // console.log("📩 currentAction", currentAction);
+            if (currentAction) {
+              this.insideState.push(currentAction);
+            }
 
             state.insideAction = false;
             state.currentAction = { content: '' };
@@ -130,13 +131,20 @@ export class StreamingMessageParser {
           const actionOpenIndex = input.indexOf(ARTIFACT_ACTION_TAG_OPEN, i);
           const artifactCloseIndex = input.indexOf(ARTIFACT_TAG_CLOSE, i);
 
-          if (actionOpenIndex !== -1 && (artifactCloseIndex === -1 || actionOpenIndex < artifactCloseIndex)) {
+          if (
+            actionOpenIndex !== -1 &&
+            (artifactCloseIndex === -1 || actionOpenIndex < artifactCloseIndex)
+          ) {
             const actionEndIndex = input.indexOf('>', actionOpenIndex);
 
             if (actionEndIndex !== -1) {
               state.insideAction = true;
 
-              state.currentAction = this.#parseActionTag(input, actionOpenIndex, actionEndIndex);
+              state.currentAction = this.#parseActionTag(
+                input,
+                actionOpenIndex,
+                actionEndIndex,
+              );
 
               this._options.callbacks?.onActionOpen?.({
                 artifactId: currentArtifact.id,
@@ -150,7 +158,10 @@ export class StreamingMessageParser {
               break;
             }
           } else if (artifactCloseIndex !== -1) {
-            this._options.callbacks?.onArtifactClose?.({ messageId, ...currentArtifact });
+            this._options.callbacks?.onArtifactClose?.({
+              messageId,
+              ...currentArtifact,
+            });
 
             state.insideArtifact = false;
             state.currentArtifact = undefined;
@@ -164,7 +175,10 @@ export class StreamingMessageParser {
         let j = i;
         let potentialTag = '';
 
-        while (j < input.length && potentialTag.length < ARTIFACT_TAG_OPEN.length) {
+        while (
+          j < input.length &&
+          potentialTag.length < ARTIFACT_TAG_OPEN.length
+        ) {
           potentialTag += input[j];
 
           if (potentialTag === ARTIFACT_TAG_OPEN) {
@@ -181,8 +195,14 @@ export class StreamingMessageParser {
             if (openTagEnd !== -1) {
               const artifactTag = input.slice(i, openTagEnd + 1);
 
-              const artifactTitle = this.#extractAttribute(artifactTag, 'title') as string;
-              const artifactId = this.#extractAttribute(artifactTag, 'id') as string;
+              const artifactTitle = this.#extractAttribute(
+                artifactTag,
+                'title',
+              ) as string;
+              const artifactId = this.#extractAttribute(
+                artifactTag,
+                'id',
+              ) as string;
 
               if (!artifactTitle) {
                 // logger.warn('Artifact title missing');
@@ -201,9 +221,13 @@ export class StreamingMessageParser {
 
               state.currentArtifact = currentArtifact;
 
-              this._options.callbacks?.onArtifactOpen?.({ messageId, ...currentArtifact });
+              this._options.callbacks?.onArtifactOpen?.({
+                messageId,
+                ...currentArtifact,
+              });
 
-              const artifactFactory = this._options.artifactElement ?? createArtifactElement;
+              const artifactFactory =
+                this._options.artifactElement ?? createArtifactElement;
 
               output += artifactFactory({ messageId });
 
@@ -237,14 +261,18 @@ export class StreamingMessageParser {
 
     state.position = i;
 
-    return output;
+    return { output, state: this.insideState };
   }
 
   reset() {
     this.#messages.clear();
   }
 
-  #parseActionTag(input: string, actionOpenIndex: number, actionEndIndex: number) {
+  #parseActionTag(
+    input: string,
+    actionOpenIndex: number,
+    actionEndIndex: number,
+  ) {
     const actionTag = input.slice(actionOpenIndex, actionEndIndex + 1);
 
     const actionType = this.#extractAttribute(actionTag, 'type') as ActionType;

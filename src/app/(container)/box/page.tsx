@@ -1,4 +1,4 @@
-import Box from "@/components/box/box";
+import Box from '@/components/box/box';
 
 export const metadata = {
   title: 'Box',

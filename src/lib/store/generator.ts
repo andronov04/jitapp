@@ -1,4 +1,4 @@
-import {Instance, SnapshotIn, SnapshotOut, types} from "mobx-state-tree";
+import { Instance, SnapshotIn, SnapshotOut, types } from 'mobx-state-tree';
 
 export const GeneratorStore = types
   .model({
@@ -10,12 +10,11 @@ export const GeneratorStore = types
     // },
   }))
   .actions((self) => {
-
     // const setIndex = (index: string) => {
     //   self.index = index;
     // };
 
-    return { };
+    return {};
   });
 
 export type IGeneratorStore = Instance<typeof GeneratorStore>;

@@ -1,7 +1,7 @@
-"use client";
-import React, { createContext, ReactNode, useEffect } from "react";
-import {useStore} from "@/lib/store";
-import {IAppStore} from "@/lib/store/app";
+'use client';
+import React, { createContext, ReactNode, useEffect } from 'react';
+import { useStore } from '@/lib/store';
+import { IAppStore } from '@/lib/store/app';
 
 export const StoreContext = createContext<{
   app: IAppStore;
@@ -9,7 +9,10 @@ export const StoreContext = createContext<{
   app: {} as IAppStore,
 });
 
-export const StoreWrapper = ({ children, app }: { children: ReactNode; app?: any }) => {
+export const StoreWrapper = ({
+  children,
+  app,
+}: { children: ReactNode; app?: any }) => {
   const store = useStore({ app });
 
   // useEffect(() => {
@@ -31,5 +34,7 @@ export const StoreWrapper = ({ children, app }: { children: ReactNode; app?: any
   // }, []);
 
   // @ts-ignore
-  return <StoreContext.Provider value={store}>{children}</StoreContext.Provider>;
+  return (
+    <StoreContext.Provider value={store}>{children}</StoreContext.Provider>
+  );
 };

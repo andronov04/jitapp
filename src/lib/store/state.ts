@@ -1,41 +1,47 @@
-import {getParent, getRoot, Instance, SnapshotIn, SnapshotOut, types} from "mobx-state-tree";
-import {nanoid} from "nanoid";
+import {
+  getParent,
+  getRoot,
+  Instance,
+  SnapshotIn,
+  SnapshotOut,
+  types,
+} from 'mobx-state-tree';
+import { nanoid } from 'nanoid';
 
-const FilesStore = types
+const StateItemStore = types
   .model({
     key: types.identifier, // pathFile
-    attrs: types.optional(types.frozen(), {}),
-    content: types.optional(types.string, ""),
-    // pathFile: types.optional(types.string, ""),
-    prevValue: types.optional(types.string, ""),
-    value: types.string, // content
+    pathFile: types.optional(types.string, ''),
+    content: types.optional(types.string, ''),
+    type: types.optional(types.string, ''),
+    prevContent: types.optional(types.string, ''),
     changed: false,
   })
   .views((self) => {
-    return ({
+    return {
       get repo() {
         return getRoot(self) as any;
       },
       get parent() {
         return getParent(getParent(self)) as any;
       },
-    });
+    };
   })
   .actions((self) => {
     return {
-      updateValue(value: string, force = true) {
-        self.value = value;
+      updateContent(content: string, force = true) {
+        self.content = content;
         // force && self.parent.setIndex(nanoid());
       },
       setChanged() {
         if (!self.changed) {
-          self.prevValue = self.value;
+          self.prevContent = self.content;
         }
         self.changed = true;
       },
       setUnchanged() {
         self.changed = false;
-        self.prevValue = "";
+        self.prevContent = '';
       },
     };
   });
@@ -44,35 +50,36 @@ const FilesStore = types
 export const StateStore = types
   .model({
     id: types.identifier,
-    files: types.map(FilesStore),
+    state: types.map(StateItemStore),
   })
   .views((self) => ({
     get getFiles() {
-      return Array.from(self.files.values());
+      return Array.from(self.state.values()).filter(
+        (item: any) => item.type === 'file',
+      );
     },
   }))
   .actions((self) => {
-
     const updateState = (state: any) => {
-      console.log("updateStateupdateState", state);
       if (Array.isArray(state)) {
         state.forEach((item: any) => {
-          item.files.forEach((f: any) => {
-            const key = f.attrs.filePath;
-            const file = self.files.get(key);
-            if (file) {
-              file.updateValue(f.content || file.value || "", true);
-            } else {
-              self.files.put(FilesStore.create({ key, value: f.content ?? "" }));
-            }
-            // const fileStore = self.files.get(file.attrs.filePath);
-            // if (fileStore) {
-            //   fileStore.updateValue(file.content);
-            // }
-          });
+          const key = item.filePath || item.key;
+          if (!key) return;
+          const stateItem = self.state.get(key);
+          if (stateItem) {
+            stateItem.updateContent(item.content || '', true);
+          } else {
+            self.state.put(
+              StateItemStore.create({
+                key,
+                content: item.content ?? '',
+                type: item.type ?? 'unknown',
+                filePath: item.filePath,
+              }),
+            );
+          }
         });
       }
-      console.log("updateStateupdateState2222", self.getFiles.length);
     };
 
     return { updateState };

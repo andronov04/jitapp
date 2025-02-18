@@ -52,6 +52,7 @@ model Model {
   id        String    @id @default(uuid())
   name      String
   provider  String?
+  key       String
   params    Json?
   createdAt DateTime  @default(now())
   messages  Message[]

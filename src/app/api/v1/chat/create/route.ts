@@ -1,9 +1,10 @@
-import {NextResponse} from "next/server";
-import {generateId} from "@/lib/utils";
-import prisma from "@/prisma";
+import { NextResponse } from 'next/server';
+import { generateId } from '@/lib/utils';
+import prisma from '@/prisma';
+import { generateTitleFromUserMessage } from '@/lib/actions/chat';
+import { auth } from '@/lib/supabase/auth';
 
 export const maxDuration = 60;
-
 
 export async function POST(request: Request) {
   const {
@@ -11,82 +12,99 @@ export async function POST(request: Request) {
     boxId,
     messages,
   }: { input: string; boxId: string; messages: any[] } = await request.json();
-  console.log("POST", input, boxId, messages);
-  const generatorId = "6c73628c-11bf-4a64-a525-bda25dc0f58e";
-  const modelId = "aa3ef862-79f9-4008-ac3f-26a91ae8982b";
+  console.log('POST', input, boxId, messages);
 
-  const box = await prisma.box.create({
-    data: {
+  const currentUser = await auth();
+
+  if (!currentUser || !currentUser.id) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
+  // const ge
+  const title = await generateTitleFromUserMessage({
+    message: { content: input, role: 'user' },
+  });
+
+  let box = await prisma.box.findFirst({
+    where: {
       id: boxId,
-      name: "Box 1",
-      description: "Box 1 description",
-      createdAt: new Date(),
-      slug: generateId(),
-      data: {},
-    },
-  })
+    }, // TODO: validation by user private and etc
+  });
+  if (!box) {
+    box = await prisma.box.create({
+      data: {
+        id: boxId,
+        name: title,
+        userId: currentUser.id,
+        description: '',
+        createdAt: new Date(),
+        slug: generateId(),
+        data: {},
+      },
+    });
+  }
 
-
-
-  // const session = await auth();
-  //
-  // if (!session || !session.id) {
-  //   return new Response('Unauthorized', { status: 401 });
-  // }
+  // let userMessageId: string | undefined = undefined;
   const newMessages = [];
   for (const message of messages) {
-    if (message.role === "user") {
+    if (message.role === 'user') {
       const userMessage = await prisma.message.create({
         data: {
           id: message.id,
-          role: "user" as any,
-          kind: "user" as any,
+          role: 'user' as any,
+          kind: 'user' as any,
           content: input,
-          status: "created",
+          userId: currentUser.id,
+          status: 'created',
           createdAt: new Date(),
           boxId: boxId,
         },
       });
+      // userMessageId = userMessage.id;
       newMessages.push({
         role: userMessage.role,
         id: userMessage.id,
-        status: "created",
+        status: 'created',
       });
     } else {
       const parentMessage = await prisma.message.create({
         data: {
           id: message.id,
           role: message.role as any,
-          kind: "group",
-          content: "",
-          status: "created",
+          kind: 'group',
+          content: '',
+          userId: currentUser.id,
+          status: 'created',
           createdAt: new Date(),
           boxId: boxId,
         },
       });
+      // console.log("userMessageId", userMessageId);
       await prisma.message.createMany({
         data: message.children?.map((child: any) => ({
           id: child.id,
-          role: "assistant" as any,
+          role: 'assistant' as any,
           // role: child.role as any,
-          kind: "ai",
-          content: "",
-          generatorId,
-          modelId,
+          kind: 'ai',
+          content: '',
+          // userMessageId,
+          generatorId: child.generatorId,
+          userId: currentUser.id,
+          modelId: child.modelId,
           createdAt: new Date(),
           boxId: boxId,
           parentMessageId: parentMessage.id,
-          status: "created",
-        }))
+          status: 'created',
+        })),
       });
       newMessages.push({
         role: parentMessage.role,
         id: parentMessage.id,
-        status: "created",
+        status: 'created',
         children: message.children.map((child: any) => ({
           id: child.id,
           role: child.role as any,
-          status: "ready",
+          status: 'ready',
         })),
       });
     }
@@ -100,5 +118,5 @@ export async function POST(request: Request) {
    * 4. Create box
    */
 
-  return NextResponse.json({ box, messages: newMessages }, { status: 200 })
+  return NextResponse.json({ box, messages: newMessages }, { status: 200 });
 }

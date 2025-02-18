@@ -1,13 +1,9 @@
-import {NextResponse} from "next/server";
+import { NextResponse } from 'next/server';
 
 export const maxDuration = 60;
 
-
 export async function POST(request: Request) {
-  const {
-    input,
-  }: { input: string;  } =
-    await request.json();
+  const { input }: { input: string } = await request.json();
 
   // const session = await auth();
   //
@@ -21,5 +17,5 @@ export async function POST(request: Request) {
   //   return new Response('Model not found', { status: 404 });
   // }
 
-  return NextResponse.json({ ok: true }, { status: 200 })
+  return NextResponse.json({ ok: true }, { status: 200 });
 }

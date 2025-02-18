@@ -1,6 +1,6 @@
 'use server';
 
-import prisma from "@/prisma";
+import prisma from '@/prisma';
 
 export async function getModels() {
   const _models = await prisma.model.findMany();
@@ -8,5 +8,6 @@ export async function getModels() {
     id: model.id,
     name: model.name,
     provider: model.provider,
+    key: model.key,
   }));
 }

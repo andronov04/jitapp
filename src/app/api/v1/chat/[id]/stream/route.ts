@@ -1,63 +1,110 @@
-import { NextResponse } from "next/server";
-import {streamText} from "ai";
-import {getSystemPrompt} from "@/lib/llm/llm/prompts";
-import {createOpenAI} from "@ai-sdk/openai";
-import {parseArtifacts} from "@/lib/llm/utils/parser";
-import prisma from "@/prisma";
+import { NextResponse } from 'next/server';
+import { smoothStream, streamText } from 'ai';
+import { getSystemPrompt } from '@/lib/llm/llm/prompts';
+import { createOpenAI } from '@ai-sdk/openai';
+import prisma from '@/prisma';
+import {
+  getMessageForStream,
+  getMessagesForStream,
+} from '@/lib/actions/message';
+import { createFireworks } from '@ai-sdk/fireworks';
+import { createMessageParser } from '@/lib/runtime/create-parser';
+import { createDeepSeek } from '@ai-sdk/deepseek';
+import { createAnthropic } from '@ai-sdk/anthropic';
 
-export const maxDuration = 60;
+export const maxDuration = 360;
 
+const fireworks = createFireworks({
+  apiKey: process.env.FIREWORKS_API_KEY ?? '',
+});
+
+const deepseek = createDeepSeek({
+  apiKey: process.env.DEEPSEEK_API_KEY ?? '',
+});
 
 const openAi = createOpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-})
+});
+
+const anthropic = createAnthropic({
+  apiKey: process.env.AI_ANTHROPIC_API_KEY ?? '',
+});
 
 export async function GET(request: Request) {
   // Получаем `messageId` из query параметров
   const { searchParams } = new URL(request.url);
-  const messageId = searchParams.get("messageId");
-  const MODEL = "gpt-4o-mini";
+  const messageId = searchParams.get('messageId');
+  if (!messageId) {
+    return new Response('messageId is required', { status: 400 });
+  }
+  const msg = await getMessageForStream(messageId);
+  // if (!msg) {
+  //   return new Response("messageId is required", { status: 400 });
+  // }
+  console.log('messageId', messageId, 'msg', msg);
 
-  // // // Создаём ReadableStream для потока
-  // const stream = new ReadableStream({
-  //   async start(controller) {
-  //     try {
-  //       for (let i = 1; i <= 1; i++) {
-  //         const message = `Here is a simple \"Hello World\" project using HTML, CSS, and JavaScript.\n\n<jitProject id=\"hello-world\" title=\"Hello World Project\">\n  <jitFile type="file" filePath=\"package.json\">\n    {\n      \"name\": \"hello-world\",\n      \"private\": true,\n      \"version\": \"0.0.0\",\n      \"scripts\": {\n        \"dev\": \"vite\"\n      }\n    }\n  </jitFile>\n\n  <jitFile type="file" filePath=\"index.html\">\n    <!DOCTYPE html>\n    <html lang=\"en\">\n    <head>\n      <meta charset=\"UTF-8\">\n      <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n      <title>Hello World</title>\n      <link rel=\"stylesheet\" href=\"style.css\">\n    </head>\n    <body>\n      <h1 id=\"greeting\">Hello, World!</h1>\n      <script src=\"script.js\"></script>\n    </body>\n    </html>\n  </jitFile>\n\n  <jitFile type="file" filePath=\"style.css\">\n    body {\n      display: flex;\n      justify-content: center;\n      align-items: center;\n      height: 100vh;\n      background-color: #f0f0f0;\n      font-family: Arial, sans-serif;\n    }\n\n    h1 {\n      color: #333;\n    }\n  </jitFile>\n\n  <jitFile type="file" filePath=\"script.js\">\n    console.log('Hello, World!');\n  </jitFile>\n</jitProject>`
-  //         controller.enqueue(new TextEncoder().encode(message));
-  //         await new Promise((resolve) => setTimeout(resolve, 1000)); // Эмуляция задержки
-  //       }
-  //       controller.close();
-  //     } catch (error) {
-  //       controller.error(error);
-  //     }
-  //   },
-  // });
-  //
-  // return new NextResponse(stream, {
-  //   status: 200,
-  //   headers: {
-  //     "Content-Type": "text/plain; charset=utf-8",
-  //     "Cache-Control": "no-cache",
-  //     "X-Accel-Buffering": "no",
-  //     "Connection": "keep-alive",
-  //   },
-  // });
+  // TODO get history
 
+  // TODO: try catch and update message status
+
+  let model; // TODO switch key by model
+  if (msg.model?.key.includes('deepseek')) {
+    // model = deepseek('deepseek-reasoner');
+    // model =  anthropic('claude-3-5-sonnet-latest')
+    model = fireworks('accounts/fireworks/models/deepseek-r1');
+    // model = fireworks("accounts/fireworks/models/deepseek-v3");
+  } else {
+    model = openAi(msg.model.key);
+  }
+  let system; // TODO switch key by generator
+  if (msg.generator) {
+    system = getSystemPrompt('/home/user');
+    // system = getSystemPrompt(msg.generator.name);
+  }
+
+  let fitMessages = [];
+  const messages = await getMessagesForStream(msg.boxId);
+  console.log('messagesss', messages);
+  for (const message of messages) {
+    if (message.role === 'user') {
+      fitMessages.push({
+        role: 'user',
+        content: message.content,
+      });
+    } else if (message.role === 'assistant') {
+      fitMessages.push({
+        role: 'assistant',
+        content: message.content,
+      });
+    } else if (message.role === 'group') {
+      message.children.forEach((child: any) => {
+        if (child.role === 'assistant') {
+          fitMessages.push({
+            role: 'assistant',
+            content: child.content,
+          });
+        }
+      });
+    }
+  }
+  fitMessages = fitMessages.filter((m: any) => m.content.length > 0);
+  console.log('fitMessages', fitMessages);
+  // throw new Error("Not implemented example");
 
   try {
-    let contentText = "";
-    console.log("streamText");
+    let contentText = '';
+    console.log('streamText');
     const result = streamText({
-      model: openAi(MODEL),
-      system: getSystemPrompt("/home/user"),
-      messages: [{
-        role: "user",
-        content: `Create a simple "Hello World" project using HTML, CSS, and JavaScript.`,
-      }],
+      model: model as any,
+      system,
+      experimental_transform: smoothStream({ chunking: 'word' }),
+      // maxSteps: 5, // enable multi-step calls
+      // experimental_continueSteps: true,
+      messages: fitMessages as any,
       onChunk: async ({ chunk }) => {
-        if (chunk.type === "text-delta") {
-          contentText += chunk.textDelta || "";
+        // TODO: reasoning
+        if (chunk.type === 'text-delta') {
+          contentText += chunk.textDelta || '';
           // const data = parseArtifacts(contentText);
           // console.log("onChunk", JSON.stringify(data, null, 2));
           // Merge state
@@ -68,40 +115,36 @@ export async function GET(request: Request) {
       //   console.log("onError", error);
       //   // reject(error);
       // },
-      onFinish: async () => {
-        console.log("onFinish");
-        const data = parseArtifacts(contentText);
-        console.log("onFinish", JSON.stringify(data?.[0], null, 2));
+      onFinish: async (event) => {
+        console.log('onFinish', event);
+        const mParser = createMessageParser();
+        const result = mParser.parse(messageId, contentText);
+        console.log('onFinishhhh', result);
+        // // const data = parseArtifacts(contentText);
+        // console.log("onFinish", JSON.stringify(data?.[0], null, 2));
+        if (!result.state?.length) {
+          throw new Error('Something went wrong');
+        }
         await prisma.state.create({
           data: {
-            id: messageId ?? "",
+            id: messageId ?? '',
             data: {
               messageId: messageId,
-              data
-            }
+              data: result.state,
+            },
           },
         });
         if (messageId) {
-          const msg = await prisma.message.findUnique({
+          await prisma.message.update({
             where: {
               id: messageId,
             },
+            data: {
+              status: 'ready',
+              content: contentText,
+            },
           });
-          console.log("msg", msg);
-          if (msg) {
-            await prisma.message.update({
-              where: {
-                id: messageId,
-              },
-              data: {
-                status: "ready",
-                content: contentText
-              },
-            });
-            // originalText and fitText
-          }
         }
-
 
         // resolve("Stream finished"); // Разрешаем промис после завершения потока
       },
@@ -111,7 +154,7 @@ export async function GET(request: Request) {
     // }
     return result.toTextStreamResponse();
   } catch (error) {
-    console.log("error", error);
+    console.log('error', error);
     // reject(error); // Отлавливаем ошибки
   }
 }

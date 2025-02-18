@@ -1,12 +1,12 @@
-import {Instance, SnapshotIn, SnapshotOut, types} from "mobx-state-tree";
-import {StateStore} from "@/lib/store/state";
-import {ToolStore} from "@/lib/store/tool";
-import {MessageStore} from "@/lib/store/message";
+import { Instance, SnapshotIn, SnapshotOut, types } from 'mobx-state-tree';
+import { StateStore } from '@/lib/store/state';
+import { ToolStore } from '@/lib/store/tool';
+import { MessageStore } from '@/lib/store/message';
 
 export const WorkbenchStore = types
   .model({
     id: types.identifier,
-    status: types.optional(types.string, "created"), // streaming, ready
+    status: types.optional(types.string, 'created'), // streaming, ready
     currentState: types.maybeNull(StateStore),
     tools: types.array(ToolStore),
     // messageId: types.safeReference(MessageStore),
@@ -17,19 +17,19 @@ export const WorkbenchStore = types
     // },
   }))
   .actions((self) => {
-
     // const setIndex = (index: string) => {
     //   self.index = index;
     // };
-    const updateState = (state: any) => {
+    const updateState = (state: any, status?: string) => {
       // self.messageId = state.messageId;
+      self.status = status ?? self.status;
       if (!self.currentState?.id) {
         self.currentState = StateStore.create({
           id: self.id,
         });
       }
       self.currentState.updateState(state);
-    }
+    };
 
     return { updateState };
   });

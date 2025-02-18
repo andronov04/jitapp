@@ -1,4 +1,4 @@
-import {Instance, SnapshotIn, SnapshotOut, types} from "mobx-state-tree";
+import { Instance, SnapshotIn, SnapshotOut, types } from 'mobx-state-tree';
 
 export const ToolStore = types
   .model({
@@ -11,12 +11,11 @@ export const ToolStore = types
     // },
   }))
   .actions((self) => {
-
     // const setIndex = (index: string) => {
     //   self.index = index;
     // };
 
-    return { };
+    return {};
   });
 
 export type IToolStore = Instance<typeof ToolStore>;

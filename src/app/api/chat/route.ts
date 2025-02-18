@@ -23,7 +23,7 @@ import { systemPrompt } from '@/lib/ai/prompts';
 import { customModel } from '@/lib/ai';
 import { deleteChatById, getChatById, saveChat } from '@/lib/actions/chat';
 import { saveMessages } from '@/lib/actions/message';
-import {getSystemPrompt} from "@/lib/llm/llm/prompts";
+import { getSystemPrompt } from '@/lib/llm/llm/prompts';
 
 export const maxDuration = 60;
 
@@ -89,27 +89,27 @@ export async function POST(request: Request) {
         content: userMessageId,
       });
 
-      const msg1 = "123";
-      const msg2 = "456";
+      const msg1 = '123';
+      const msg2 = '456';
 
       // Создаем промисы для обоих стримов
       const streamPromise1 = new Promise((resolve) => {
         const result1 = streamText({
           model: customModel(model.apiIdentifier),
-          system: getSystemPrompt("/home/user/"),
+          system: getSystemPrompt('/home/user/'),
           messages: [
             {
               role: 'user',
               content: 'simple hello world',
-            }
+            },
           ],
           maxSteps: 1,
           experimental_transform: smoothStream({ chunking: 'word' }),
-          onChunk: async ({chunk}) => {
-            chunk.textDelta = `<jitMsg data-id="${msg1}">${chunk.textDelta}</jitMsg>`
+          onChunk: async ({ chunk }) => {
+            chunk.textDelta = `<jitMsg data-id="${msg1}">${chunk.textDelta}</jitMsg>`;
             // chunk.textDelta = `${msg1}-${chunk.textDelta}` //JSON.stringify({ "msgId": 1, text: chunk.textDelta })
             // chunk.args = { msgId: msg1 }
-            console.log("chunk", chunk);
+            console.log('chunk', chunk);
           },
           onFinish: async ({ response }) => {
             // if (session?.id) {

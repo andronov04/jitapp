@@ -1,5 +1,5 @@
-import {Box} from "@/components/box/box";
-import TestView from "@/components/box/test";
+import { Box } from '@/components/box/box';
+import TestView from '@/components/box/test';
 
 export const metadata = {
   title: 'Test',

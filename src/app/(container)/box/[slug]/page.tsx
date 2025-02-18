@@ -1,21 +1,30 @@
-import { notFound } from "next/navigation";
-import prisma from "@/prisma";
-import Box from "@/components/box/box";
-import {getBoxStateBySlug} from "@/lib/actions/box";
-import {getMessageState} from "@/lib/actions/state";
+import { notFound } from 'next/navigation';
+import prisma from '@/prisma';
+import Box from '@/components/box/box';
+import { getBoxStateBySlug } from '@/lib/actions/box';
+import { getMessageState } from '@/lib/actions/state';
 
 export default async function Post({
-                                     params,
-                                   }: {
+  params,
+}: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  console.log("bid:bid", slug);
+  console.log('bid:bid', slug);
   const box = await getBoxStateBySlug(slug);
-  console.log("boxpage", box);
-  const stateId = "91454ed6-a6db-4ffb-8a5f-8b0d2998c384";
-  const messageState = await getMessageState(stateId);
-  // console.log("messageState", messageState?.data?.data[0]);
+  console.log('boxpage', box.messages[box.messages.length - 1]);
+  const lastMessage = box.messages[box.messages.length - 1];
+  const states = lastMessage?.children
+    ? await Promise.all(
+        lastMessage.children.map(async (child: any) => {
+          return getMessageState(child.id);
+        }),
+      )
+    : [];
+
+  // const stateId = "d006ba4b-adee-46b5-92d3-8620b0ca02e0";
+  // const messageState = await getMessageState(stateId);
+  // console.log("messageState", messageState, "states", states);
   // const workbenches = [
   //   {
   //     id: stateId,
@@ -41,7 +50,7 @@ export default async function Post({
 
   return (
     <>
-      <Box data={{ box, messageState: messageState?.data?.data }} />
+      <Box data={{ box, messageStates: states.filter((a) => a) }} />
     </>
   );
 }

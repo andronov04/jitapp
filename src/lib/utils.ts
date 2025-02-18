@@ -60,8 +60,10 @@ export const generateUuid = () => {
   return uuidv4();
 };
 
-
-export const fetcher = async (url: string, body: any): Promise<{ data: any; error: ApplicationError | null }> => {
+export const fetcher = async (
+  url: string,
+  body: any,
+): Promise<{ data: any; error: ApplicationError | null }> => {
   const res = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
@@ -81,7 +83,7 @@ export const fetcher = async (url: string, body: any): Promise<{ data: any; erro
     // throw error;
     return {
       data: null,
-      error
+      error,
     };
   }
 

@@ -1,4 +1,9 @@
-import { PrismaClient, BoxMode, MessageRole, MessageKind } from '@prisma/client';
+import {
+  PrismaClient,
+  BoxMode,
+  MessageRole,
+  MessageKind,
+} from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -7,8 +12,9 @@ async function main() {
   const [gpt4, deepSeek] = await Promise.all([
     prisma.model.create({
       data: {
-        name: 'GPT-4',
+        name: 'GPT-4o-mini',
         provider: 'OpenAI',
+        key: 'gpt-4o-mini',
         params: {
           maxTokens: 2000,
           temperature: 0.7,
@@ -19,6 +25,7 @@ async function main() {
       data: {
         name: 'DeepSeek',
         provider: 'CustomAI',
+        key: 'deepseek-r1',
         params: {
           maxTokens: 1500,
           temperature: 0.8,
@@ -49,6 +56,18 @@ async function main() {
     }),
   ]);
 
+  prisma.user.create({
+    data: {
+      username: 'andronov04',
+      email: 'andronov04@gmail.com',
+    },
+  });
+  prisma.user.create({
+    data: {
+      username: 'elonmusk',
+      email: 'elonmusk@gmail.com',
+    },
+  });
 
   console.log('Seed data has been successfully created!');
 }

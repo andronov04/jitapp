@@ -8,7 +8,7 @@ export default function TestView() {
 
   return (
     <div>
-      {messages.map(message => (
+      {messages.map((message) => (
         <div key={message.id}>
           <div>{message.role}</div>
           <div>{message.content}</div>
