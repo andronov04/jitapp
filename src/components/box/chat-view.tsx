@@ -9,8 +9,8 @@ import { useState } from 'react';
 import type { Attachment } from 'ai';
 import { useBlockSelector } from '@/hooks/use-block';
 import { VisibilityType } from '@/components/chat/visibility-selector';
-import { useStore } from '@/lib/store';
 import { observer } from 'mobx-react-lite';
+import {useStores} from "@/hooks/useStores";
 
 const ChatView = observer(
   ({
@@ -29,7 +29,7 @@ const ChatView = observer(
     isReadonly: boolean;
   }) => {
     const { mutate } = useSWRConfig();
-    const { app } = useStore();
+    const { app } = useStores();
 
     // const {
     //   messages,
@@ -103,6 +103,7 @@ const ChatView = observer(
         id: generateUuid(),
         content: input,
         role: 'user',
+        userId: app.currentUser?.id,
         status: 'initial',
       });
       const oneId = generateUuid();
@@ -111,25 +112,28 @@ const ChatView = observer(
         role: 'group',
         content: '',
         status: 'initial',
+        userId: app.currentUser?.id,
         children: [
           {
             id: generateUuid(),
             role: 'assistant',
             status: 'initial',
             modelId: simpleModel?.id,
+            userId: app.currentUser?.id,
             generatorId,
             parentId: oneId,
             content: ``,
           },
-          // {
-          //   "id": generateUuid(),
-          //   "role": "assistant",
-          //   status: 'created',
-          //   modelId: simpleModel2?.id,
-          //   generatorId,
-          //   "parentId": oneId,
-          //   "content": ``,
-          // },
+          {
+            "id": generateUuid(),
+            "role": "assistant",
+            status: 'created',
+            modelId: simpleModel2?.id,
+            userId: app.currentUser?.id,
+            generatorId,
+            "parentId": oneId,
+            "content": ``,
+          },
         ] as any,
       });
 
@@ -160,13 +164,13 @@ const ChatView = observer(
         }}
         className="flex flex-col text-sm min-w-0 h-dvh bg-background"
       >
-        <ChatHeader
-          chatId={id}
-          isCreating={false}
-          selectedModelId={selectedModelId}
-          selectedVisibilityType={selectedVisibilityType}
-          isReadonly={isReadonly}
-        />
+        {/*<ChatHeader*/}
+        {/*  chatId={id}*/}
+        {/*  isCreating={false}*/}
+        {/*  selectedModelId={selectedModelId}*/}
+        {/*  selectedVisibilityType={selectedVisibilityType}*/}
+        {/*  isReadonly={isReadonly}*/}
+        {/*/>*/}
 
         <Messages
           chatId={id}

@@ -10,9 +10,7 @@ export default async function Post({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  console.log('bid:bid', slug);
   const box = await getBoxStateBySlug(slug);
-  console.log('boxpage', box.messages[box.messages.length - 1]);
   const lastMessage = box.messages[box.messages.length - 1];
   const states = lastMessage?.children
     ? await Promise.all(

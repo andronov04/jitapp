@@ -219,3 +219,8 @@ export function getMessageIdFromAnnotations(message: Message) {
   // @ts-expect-error messageIdFromServer is not defined in MessageAnnotation
   return annotation.messageIdFromServer;
 }
+
+
+export const isAdmin = (email?: string) => {
+  return ["andron.andr@gmail.com", "ndrnv4@gmail.com"].includes(email ?? "");
+};

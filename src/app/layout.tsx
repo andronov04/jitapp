@@ -6,9 +6,9 @@ import { ThemeProvider } from 'next-themes';
 import { Toaster } from '@/components/ui/sonner';
 import React from 'react';
 import { StoreWrapper } from '@/lib/providers/store-provider';
-import { stateData } from '@/examplestate';
 import { getModels } from '@/lib/actions/model';
 import { ReactScan } from '@/app/ReactScan';
+import { auth } from '@/lib/supabase/auth';
 
 const roboto = Roboto({
   subsets: ['latin'],
@@ -40,16 +40,19 @@ const THEME_COLOR_SCRIPT = `\
   updateThemeColor();
 })();`;
 
-export default async function RootLayout({
-  children,
-  params,
-}: Readonly<{
-  children: React.ReactNode;
-  params: Promise<{ bid?: string; id?: string }>;
-}>) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // { currentUser, models, authLoaded: true }
   // getModels();
   const models = await getModels();
+  const currentUser = await auth();
+  const users = [];
+  if (currentUser) {
+    users.push({
+      id: currentUser.id,
+      username: currentUser?.username,
+      isCurrentUser: true,
+    });
+  }
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -75,9 +78,10 @@ export default async function RootLayout({
           <Toaster />
           <StoreWrapper
             app={{
-              ...stateData.app,
               models,
-              currentBox: { ...stateData.app.currentBox, id: generateUuid() },
+              users,
+              currentUser: currentUser?.id,
+              currentBox: { id: generateUuid() },
             }}
           >
             {children}

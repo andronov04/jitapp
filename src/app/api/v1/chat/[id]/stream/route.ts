@@ -41,7 +41,6 @@ export async function GET(request: Request) {
   // if (!msg) {
   //   return new Response("messageId is required", { status: 400 });
   // }
-  console.log('messageId', messageId, 'msg', msg);
 
   // TODO get history
 
@@ -50,8 +49,8 @@ export async function GET(request: Request) {
   let model; // TODO switch key by model
   if (msg.model?.key.includes('deepseek')) {
     // model = deepseek('deepseek-reasoner');
-    // model =  anthropic('claude-3-5-sonnet-latest')
-    model = fireworks('accounts/fireworks/models/deepseek-r1');
+    model =  anthropic('claude-3-5-sonnet-latest')
+    // model = fireworks('accounts/fireworks/models/deepseek-r1');
     // model = fireworks("accounts/fireworks/models/deepseek-v3");
   } else {
     model = openAi(msg.model.key);
@@ -64,7 +63,6 @@ export async function GET(request: Request) {
 
   let fitMessages = [];
   const messages = await getMessagesForStream(msg.boxId);
-  console.log('messagesss', messages);
   for (const message of messages) {
     if (message.role === 'user') {
       fitMessages.push({
@@ -88,12 +86,10 @@ export async function GET(request: Request) {
     }
   }
   fitMessages = fitMessages.filter((m: any) => m.content.length > 0);
-  console.log('fitMessages', fitMessages);
   // throw new Error("Not implemented example");
 
   try {
     let contentText = '';
-    console.log('streamText');
     const result = streamText({
       model: model as any,
       system,
@@ -116,10 +112,8 @@ export async function GET(request: Request) {
       //   // reject(error);
       // },
       onFinish: async (event) => {
-        console.log('onFinish', event);
         const mParser = createMessageParser();
         const result = mParser.parse(messageId, contentText);
-        console.log('onFinishhhh', result);
         // // const data = parseArtifacts(contentText);
         // console.log("onFinish", JSON.stringify(data?.[0], null, 2));
         if (!result.state?.length) {

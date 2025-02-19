@@ -12,7 +12,6 @@ export async function POST(request: Request) {
     boxId,
     messages,
   }: { input: string; boxId: string; messages: any[] } = await request.json();
-  console.log('POST', input, boxId, messages);
 
   const currentUser = await auth();
 

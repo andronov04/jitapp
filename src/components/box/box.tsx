@@ -3,18 +3,20 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import ChatView from '@/components/box/chat-view';
 import WorkbenchView from '@/components/box/workbench-view';
-import { BoxIcon, EyeIcon, HeartIcon, MessageCircleIcon } from 'lucide-react';
+import { EyeIcon, HeartIcon, MessageCircleIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import millify from 'millify';
 import LogoBlock from '@/components/common/logo-block';
-import { useStore } from '@/lib/store';
 import { observer } from 'mobx-react-lite';
 import { generateId } from 'ai';
+import BoxIcon from '@/components/common/box-icon';
+import AuthBlock from "@/components/app/auth-header";
+import {useStores} from "@/hooks/useStores";
 
 const Box = observer(({ data }: { data?: any }) => {
-  console.log(data);
-  const { app } = useStore();
-  // data?.box && app.updateCurrentBox(data.box);
+  const { app } = useStores();
+  console.log("boxxx", app.currentUser?.id)
+  // data?.box && app.updateFirstCurrentBox(data.box);
 
   // box?.updateRepo(_repo);
   const [chatWidth, setChatWidth] = useState(33); // Default 30%
@@ -60,11 +62,10 @@ const Box = observer(({ data }: { data?: any }) => {
 
   return (
     <div className="flex flex-col">
-      <header className="h-12 sticky top-0 bg-background z-10 border-b flex justify-between items-center px-4 shadow-sm">
-        <div className="flex items-center justify-between gap-2">
+      <header className="h-12 sticky top-0 bg-background z-30 border-b flex justify-between items-center px-4 shadow-sm">
+        <div className="flex  items-center justify-between gap-2">
           <LogoBlock />
-          <BoxIcon className="text-muted-foreground" />{' '}
-          <div className="text-sm">{app.currentBox?.name}</div>
+          <BoxIcon /> <div className="text-sm">{app.currentBox?.name || data?.box?.name}</div>
           <Button
             variant="ghost"
             size="sm"
@@ -90,6 +91,9 @@ const Box = observer(({ data }: { data?: any }) => {
             <span className="text-xs text-gray-400">{millify(3)}</span>
           </Button>
         </div>
+        <div className="flex w-1/3 items-center justify-end">
+          <AuthBlock/>
+        </div>
       </header>
 
       <div
@@ -100,7 +104,12 @@ const Box = observer(({ data }: { data?: any }) => {
         onMouseLeave={handleMouseUp}
       >
         <section
-          className="relative overflow-hidden z-10"
+          className="relative overflow-hidden z-10 h-full"
+          style={{ width: `${chatWidth}%` }}>
+
+        </section>
+        <section
+          className="fixed overflow-hidden z-10"
           style={{ width: `${chatWidth}%` }}
         >
           <ChatView
@@ -132,7 +141,7 @@ const Box = observer(({ data }: { data?: any }) => {
         >
           <div className="flex flex-col p-4 space-y-4 ">
             {app.currentBox?.workbenches?.map((item) => (
-              <WorkbenchView key={item.id} workbench={item} />
+              <WorkbenchView key={item.id} count={app.currentBox?.workbenches?.length ?? 0} workbench={item} />
             ))}
             {/*<WorkbenchView workbenches={data.workbenches ?? []}/>*/}
           </div>

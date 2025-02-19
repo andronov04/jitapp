@@ -4,9 +4,10 @@ export const UserStore = types
   .model({
     id: types.identifier, // key
     name: types.optional(types.string, ''),
+    avatar: types.optional(types.string, ''),
     username: types.string,
-    isCurrentUser: types.optional(types.boolean, false),
     email: types.optional(types.string, ''),
+    isCurrentUser: types.optional(types.boolean, false),
   })
   .views((self) => ({}))
   .actions((self) => {

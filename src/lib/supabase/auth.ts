@@ -6,6 +6,7 @@ export const auth = async (): Promise<IUser | undefined> => {
     id: '9f4c4ae6-ac38-478d-a330-6ab6985b6092',
     email: 'test@test.com',
     name: 'Andronov',
+    username: 'andronov04',
     image: 'https://avatars.githubusercontent.com/u/10128486?v=4',
     provider: 'github',
     createdAt: '2022-01-01T00:00:00.000Z',

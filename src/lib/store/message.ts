@@ -12,6 +12,9 @@ import { WorkbenchStore } from '@/lib/store/workbench';
 import { messageParser } from '@/hooks/useMessageParser';
 import { parseArtifacts } from '@/lib/llm/utils/parser';
 import { createMessageParser } from '@/lib/runtime/create-parser';
+import { IUserStore, UserStore } from '@/lib/store/user';
+import { IModelStore } from '@/lib/store/model';
+import { IGeneratorStore } from '@/lib/store/generator';
 
 export const StreamStore = types
   .model({
@@ -110,10 +113,8 @@ export const MessageStore = types
     generatorId: types.maybeNull(types.string),
     modelId: types.maybeNull(types.string),
     userId: types.maybeNull(types.string),
-    // user: types.maybeNull(types.model({
-    //   id: types.string,
-    //   username: types.string,
-    // })),
+    // userId: types.safeReference(UserStore),
+    // user: types.safeReference(UserStore),
     isProcessing: types.optional(types.boolean, false),
     status: types.optional(types.string, 'initial'), // streaming, ready, failed
     parentId: types.maybeNull(types.string), // ID родителя
@@ -132,10 +133,23 @@ export const MessageStore = types
     get root() {
       return getRoot(self) as any;
     },
-    get model() {
-      return (getRoot(self) as any)?.models.find(
-        (model: any) => model.id === self.modelId,
+    get model(): IModelStore | null {
+      return (
+        (getRoot(self) as any)?.models.find(
+          (a: any) => a.id === self.modelId,
+        ) ?? null
       );
+    },
+    get generator(): IGeneratorStore | null {
+      return (
+        (getRoot(self) as any)?.generators.find(
+          (a: any) => a.id === self.modelId,
+        ) ?? null
+      );
+    },
+    get user(): IUserStore | null {
+      const root = getRoot<any>(self);
+      return root.users.find((a: any) => a.id === self.userId) ?? null;
     },
     get fullContent() {
       // TODO fix it, once use, before create

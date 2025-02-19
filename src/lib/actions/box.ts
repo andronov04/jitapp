@@ -25,6 +25,12 @@ export async function getBoxStateBySlug(slug: string) {
     content: true,
     // createdAt: true,
     userId: true,
+    user: {
+      select: {
+        id: true,
+        username: true,
+      },
+    },
     role: true,
     status: true,
     modelId: true,
@@ -48,7 +54,6 @@ export async function getBoxStateBySlug(slug: string) {
       },
     },
   });
-  console.log('messages', messages, box);
 
   return {
     ...box,

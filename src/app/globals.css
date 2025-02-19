@@ -91,3 +91,20 @@ body {
 .cm-editor {
   min-height: calc(100dvh - 5.5rem);
 }
+
+.wb-full-min-height {
+  min-height: calc(100dvh - 4.8rem);
+}
+
+.wb-full-max-height {
+  max-height: calc(100dvh - 4.8rem);
+}
+
+
+.wb-part-min-height {
+  min-height: calc(100dvh - 14.8rem);
+}
+
+.wb-part-max-height {
+  max-height: calc(100dvh - 14.8rem);
+}

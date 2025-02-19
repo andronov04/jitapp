@@ -42,10 +42,6 @@ export const BoxStore = types
     //   self.isLoadingCommits = val;
     // };
 
-    const setId = () => {
-      self.id = generateUuid();
-    };
-
     const addWorkbench = (workbench: IWorkbenchStore) => {
       self.workbenches.push(workbench);
     };
@@ -197,7 +193,6 @@ export const BoxStore = types
       startStream,
       addMessage,
       setProcessing,
-      setId,
       createChat,
       updateState,
     };

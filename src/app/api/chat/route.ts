@@ -109,7 +109,6 @@ export async function POST(request: Request) {
             chunk.textDelta = `<jitMsg data-id="${msg1}">${chunk.textDelta}</jitMsg>`;
             // chunk.textDelta = `${msg1}-${chunk.textDelta}` //JSON.stringify({ "msgId": 1, text: chunk.textDelta })
             // chunk.args = { msgId: msg1 }
-            console.log('chunk', chunk);
           },
           onFinish: async ({ response }) => {
             // if (session?.id) {

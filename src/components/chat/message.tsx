@@ -28,6 +28,7 @@ import { PreMarkdown } from '@/components/chat/pre-markdown';
 import { IMessageStore } from '@/lib/store/message';
 import MessageChildren from '@/components/chat/message-children';
 import AvatarBlock from '@/components/common/avatar-block';
+import SparkleIcon from "@/components/common/sparkle-icon";
 
 const PurePreviewMessage = ({
   chatId,
@@ -52,11 +53,11 @@ const PurePreviewMessage = ({
 }) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
 
-  useEffect(() => {
-    console.log('message', message.status, message);
-  }, [message.status]);
+  // useEffect(() => {
+  //   console.log('message', message.status, message);
+  // }, [message.status]);
+  console.log(':::MESSAGE:::', message);
 
-  // console.log("message", message); group-data-[role=user]/message:ml-auto
   return (
     <AnimatePresence>
       <motion.div
@@ -114,7 +115,7 @@ const PurePreviewMessage = ({
                 {/*    </Tooltip>*/}
                 {/*  </TooltipProvider>*/}
                 {/*)}*/}
-                <AvatarBlock id={message.id} />
+                <AvatarBlock id={message.user?.id || message.id} />
 
                 <div
                   className={cn('flex flex-col', {
@@ -122,7 +123,9 @@ const PurePreviewMessage = ({
                       message.role === 'user',
                   })}
                 >
-                  <div className="text-green-600">@andronov04</div>
+                  <div className="text-green-600">
+                    @{message.user?.username ?? 'user'}
+                  </div>
                   <PreMarkdown content={message.content as string} />
                 </div>
               </div>
@@ -130,10 +133,13 @@ const PurePreviewMessage = ({
 
             {message.role === 'group' && (
               <div className="rounded-xl flex flex-row gap-2 items-start">
-                <AvatarBlock
-                  id={message.id}
-                  customSrc={'https://jit.dev/32x32.png'}
-                />
+                {/*<AvatarBlock*/}
+                {/*  id={message.id}*/}
+                {/*  customSrc={'https://jit.dev/32x32.png'}*/}
+                {/*/>*/}
+                <div className="w-8 h-8 flex-none flex items-center justify-center rounded-full bg-secondary">
+                  <SparkleIcon />
+                </div>
                 <div
                   className={cn(
                     'flex flex-col bg-secondary px-3 py-2 rounded-xl',

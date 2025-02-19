@@ -9,6 +9,7 @@ import { values } from 'mobx';
 import { BoxStore } from '@/lib/store/box';
 import { ModelStore } from '@/lib/store/model';
 import { IUserStore, UserStore } from '@/lib/store/user';
+import { GeneratorStore } from '@/lib/store/generator';
 
 let appStore: IAppStore | undefined;
 
@@ -55,6 +56,7 @@ const AppStore = types
     currentBox: types.maybeNull(BoxStore),
     models: types.array(ModelStore),
     users: types.array(UserStore),
+    generators: types.array(GeneratorStore),
     currentUser: types.safeReference(UserStore),
     // light: false,
     // authLoaded: false,
@@ -84,21 +86,38 @@ const AppStore = types
     // ),
   })
   .views((self) => ({
-    // get isAuthenticated() {
-    //   return self.currentUser !== null;
-    // },
+    get isAuthenticated() {
+      return Boolean(self.currentUser?.id);
+    },
     // get currentLayout() {
     //   return Array.from(self.layouts.values()).find((layout) => layout.active);
     // },
   }))
   .actions((self) => {
     const addOrUpdateUser = (userData: IUserStore) => {
-      self.users.push(userData); //, либо через `applySnapshot`, либо MST-utility like detach/put
+      const user = self.users.find((a) => a.id === userData.id);
+      if (user) {
+        // applySnapshot(user, userData);
+      } else {
+        self.users.push(userData); //, либо через `applySnapshot`, либо MST-utility like detach/put
+      }
     };
 
     const updateCurrentBox = (box: any) => {
+      // TODO better this and add current user
+      const users = box.messages
+        .map((msg) => [msg, ...msg.children.flat()])
+        .flat()
+        .map((a) => a.user)
+        .filter((a) => a);
+      console.log('userss', users);
+      users.map((a) => addOrUpdateUser(a));
       self.currentBox = box;
     };
+
+    const updateFirstCurrentBox = (box: any) => {
+      self.currentBox = box;
+    }
 
     // const afterCreate = () => {
     //   // TODO load from database
@@ -127,7 +146,7 @@ const AppStore = types
     // const getModelById = (id: number) => {
     //   return self.models.find((model) => model.id === id);
     // };
-    return { updateCurrentBox, addOrUpdateUser };
+    return { updateCurrentBox, updateFirstCurrentBox, addOrUpdateUser };
   });
 
 export type IAppStore = Instance<typeof AppStore>;
@@ -143,16 +162,13 @@ export function initializeAppStore(snapshot: IAppStoreSnapshotIn) {
     applySnapshot(_store, snapshot);
   }
   // For SSG and SSR always create a new store
-  if (typeof window === 'undefined') return _store;
+  if (typeof window === "undefined") return _store;
   // Create the store once in the client
   if (!appStore) appStore = _store;
 
-  if (typeof window !== 'undefined') {
-    (window as any).appStore = _store;
-  }
-
   return appStore;
 }
+
 
 export function getAppStore(): IAppStore {
   if (!appStore) {
