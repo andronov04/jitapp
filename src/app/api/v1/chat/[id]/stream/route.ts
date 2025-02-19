@@ -49,7 +49,7 @@ export async function GET(request: Request) {
   let model; // TODO switch key by model
   if (msg.model?.key.includes('deepseek')) {
     // model = deepseek('deepseek-reasoner');
-    model =  anthropic('claude-3-5-sonnet-latest')
+    model = anthropic('claude-3-5-sonnet-latest');
     // model = fireworks('accounts/fireworks/models/deepseek-r1');
     // model = fireworks("accounts/fireworks/models/deepseek-v3");
   } else {

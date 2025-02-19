@@ -40,7 +40,9 @@ const THEME_COLOR_SCRIPT = `\
   updateThemeColor();
 })();`;
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({
+  children,
+}: { children: React.ReactNode }) {
   // { currentUser, models, authLoaded: true }
   // getModels();
   const models = await getModels();
@@ -53,6 +55,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       isCurrentUser: true,
     });
   }
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>

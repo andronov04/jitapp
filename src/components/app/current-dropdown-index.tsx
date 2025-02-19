@@ -1,5 +1,5 @@
-"use client";
-import { observer } from "mobx-react-lite";
+'use client';
+import { observer } from 'mobx-react-lite';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,12 +7,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import Link from "next/link";
-import { toast } from "sonner";
-import {useStores} from "@/hooks/useStores";
-import AvatarBlock from "@/components/common/avatar-block";
-import {isAdmin} from "@/lib/utils";
+} from '@/components/ui/dropdown-menu';
+import Link from 'next/link';
+import { toast } from 'sonner';
+import { useStores } from '@/hooks/useStores';
+import AvatarBlock from '@/components/common/avatar-block';
+import { isAdmin } from '@/lib/utils';
 
 const CurrentUserDropdown = observer(() => {
   const { app } = useStores();
@@ -37,7 +37,10 @@ const CurrentUserDropdown = observer(() => {
           <DropdownMenuLabel>{app.currentUser.username}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>
-            <Link className="w-full hover:underline" href={`/${app.currentUser.username}`}>
+            <Link
+              className="w-full hover:underline"
+              href={`/${app.currentUser.username}`}
+            >
               Profile
             </Link>
           </DropdownMenuItem>
@@ -51,7 +54,7 @@ const CurrentUserDropdown = observer(() => {
               Billing
             </Link>
           </DropdownMenuItem>
-          {isAdmin(app.currentUser?.email ?? "") && (
+          {isAdmin(app.currentUser?.email ?? '') && (
             <DropdownMenuItem>
               <Link className="w-full hover:underline" href={`/admin`}>
                 Admin
@@ -59,7 +62,10 @@ const CurrentUserDropdown = observer(() => {
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogout} className="w-full cursor-pointer">
+          <DropdownMenuItem
+            onClick={handleLogout}
+            className="w-full cursor-pointer"
+          >
             Logout
           </DropdownMenuItem>
         </DropdownMenuContent>

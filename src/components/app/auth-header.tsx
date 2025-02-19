@@ -1,9 +1,8 @@
-"use client";
-import { observer } from "mobx-react-lite";
-import { Button } from "@/components/ui/button";
-import {useStores} from "@/hooks/useStores";
-import CurrentUserDropdown from "@/components/app/current-dropdown-index";
-
+'use client';
+import { observer } from 'mobx-react-lite';
+import { Button } from '@/components/ui/button';
+import { useStores } from '@/hooks/useStores';
+import CurrentUserDropdown from '@/components/app/current-dropdown-index';
 
 const AuthBlock = observer(() => {
   const { app } = useStores();

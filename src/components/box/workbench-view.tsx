@@ -5,11 +5,11 @@ import { IWorkbenchStore } from '@/lib/store/workbench';
 import { observer } from 'mobx-react-lite';
 import { AnimatePresence, motion } from 'framer-motion';
 import PreviewTool from '@/components/tools/preview-tool';
-import {useState} from "react";
-import {cn} from "@/lib/utils";
+import { useState } from 'react';
+import { cn } from '@/lib/utils';
 
 const WorkbenchView = observer(
-  ({ workbench, count }: { workbench: IWorkbenchStore, count: number }) => {
+  ({ workbench, count }: { workbench: IWorkbenchStore; count: number }) => {
     const [activeTab, setActiveTab] = useState('preview');
     const previewUrl = '';
     // const previewUrl = "https://id-preview--44283e82-135e-4a77-a8d0-871163300657.lovable.app/?forceHideBadge=true";
@@ -20,12 +20,22 @@ const WorkbenchView = observer(
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
-          <div key={workbench.id} className={
-            cn(count> 1 ? "wb-part-min-height wb-part-max-height" : "wb-full-min-height wb-full-max-height", "h-full  flex flex-col w-full")
-          }>
+          <div
+            key={workbench.id}
+            className={cn(
+              count > 1
+                ? 'wb-part-min-height wb-part-max-height'
+                : 'wb-full-min-height wb-full-max-height',
+              'h-full  flex flex-col w-full',
+            )}
+          >
             {/*<div className="px-2 mb-1 font-normal">{workbench.message}</div>*/}
             <div className="bg-secondary flex flex-col overflow-hidden w-full flex-grow rounded-lg">
-              <Tabs onValueChange={setActiveTab} defaultValue={activeTab} className="w-full">
+              <Tabs
+                onValueChange={setActiveTab}
+                defaultValue={activeTab}
+                className="w-full"
+              >
                 <TabsList>
                   {workbench.tools?.map((item) => (
                     <TabsTrigger key={item.id} value={item.id}>
@@ -38,15 +48,16 @@ const WorkbenchView = observer(
                   {/*<TabsTrigger value="graph">Graph</TabsTrigger>*/}
                   {/*<TabsTrigger value="summary">Summary</TabsTrigger>*/}
                 </TabsList>
-
               </Tabs>
-
 
               <div className="flex-grow w-full flex flex-col flex-nowrap">
                 {workbench.tools?.map((item) => (
                   <div
                     key={item.id}
-                    className={cn(item.id === activeTab ? "flex" : "hidden"," basis-full flex-grow flex-col h-full w-full")}
+                    className={cn(
+                      item.id === activeTab ? 'flex' : 'hidden',
+                      ' basis-full flex-grow flex-col h-full w-full',
+                    )}
                   >
                     {item.id === 'preview' && (
                       <PreviewTool
@@ -57,7 +68,10 @@ const WorkbenchView = observer(
 
                     {item.id === 'code' && (
                       <div
-                        className={cn(item.id === activeTab ? "flex" : "hidden","basis-full flex-grow flex-col h-full w-full")}
+                        className={cn(
+                          item.id === activeTab ? 'flex' : 'hidden',
+                          'basis-full flex-grow flex-col h-full w-full',
+                        )}
                       >
                         {workbench.currentState?.getFiles.map((file) => (
                           <div key={file.key}>
@@ -76,7 +90,6 @@ const WorkbenchView = observer(
                   </div>
                 ))}
               </div>
-
             </div>
           </div>
         </motion.div>

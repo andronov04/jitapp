@@ -28,7 +28,7 @@ import { PreMarkdown } from '@/components/chat/pre-markdown';
 import { IMessageStore } from '@/lib/store/message';
 import MessageChildren from '@/components/chat/message-children';
 import AvatarBlock from '@/components/common/avatar-block';
-import SparkleIcon from "@/components/common/sparkle-icon";
+import SparkleIcon from '@/components/common/sparkle-icon';
 
 const PurePreviewMessage = ({
   chatId,

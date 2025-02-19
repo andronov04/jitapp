@@ -199,7 +199,12 @@ export const MessageStore = types
       return null;
     };
 
-    return { generateStreaming, findMessageById, updateMessage, streamCallback };
+    return {
+      generateStreaming,
+      findMessageById,
+      updateMessage,
+      streamCallback,
+    };
   });
 
 export type IMessageStore = Instance<typeof MessageStore>;

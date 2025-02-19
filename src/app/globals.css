@@ -108,3 +108,7 @@ body {
 .wb-part-max-height {
   max-height: calc(100dvh - 14.8rem);
 }
+
+.g-is-drag .iframe {
+  pointer-events: none;
+}

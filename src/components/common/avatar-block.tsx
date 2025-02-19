@@ -11,7 +11,7 @@ export default function AvatarBlock({
   className?: string;
 }) {
   return (
-    <Avatar className={className ?? "w-8 h-8"}>
+    <Avatar className={className ?? 'w-8 h-8'}>
       <AvatarImage src={customSrc || ''} />
       <AvatarFallback className="rounded-lg">
         <BoringAvatar.default size={120} name={id as any} />

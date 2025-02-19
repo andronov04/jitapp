@@ -112,12 +112,12 @@ const AppStore = types
         .filter((a) => a);
       console.log('userss', users);
       users.map((a) => addOrUpdateUser(a));
-      self.currentBox = {...box, originalId: box.id};
+      self.currentBox = { ...box, originalId: box.id };
     };
 
     const updateFirstCurrentBox = (box: any) => {
-      self.currentBox = {...box, originalId: box.id};
-    }
+      self.currentBox = { ...box, originalId: box.id };
+    };
 
     // const afterCreate = () => {
     //   // TODO load from database
@@ -162,13 +162,12 @@ export function initializeAppStore(snapshot: IAppStoreSnapshotIn) {
     applySnapshot(_store, snapshot);
   }
   // For SSG and SSR always create a new store
-  if (typeof window === "undefined") return _store;
+  if (typeof window === 'undefined') return _store;
   // Create the store once in the client
   if (!appStore) appStore = _store;
 
   return appStore;
 }
-
 
 export function getAppStore(): IAppStore {
   if (!appStore) {

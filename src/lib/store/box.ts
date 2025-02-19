@@ -28,6 +28,8 @@ export const BoxStore = types
     workbenches: types.array(WorkbenchStore),
     messages: types.array(MessageStore),
     isFirst: types.optional(types.boolean, true),
+    numLikes: types.optional(types.number, 0),
+    numViews: types.optional(types.number, 0),
     // isReady
   })
   .views((self) => ({
@@ -87,7 +89,7 @@ export const BoxStore = types
       }
       self.isFirst = false;
       const { box, messages: newMessages } = data;
-      window.history.replaceState({}, '', `/box/${box.slug}`);
+      window.history.replaceState({}, '', `/i/${box.slug}`);
       self.name = box.name;
       self.description = box.description;
       self.empty = false;

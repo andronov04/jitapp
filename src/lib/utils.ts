@@ -220,7 +220,6 @@ export function getMessageIdFromAnnotations(message: Message) {
   return annotation.messageIdFromServer;
 }
 
-
 export const isAdmin = (email?: string) => {
-  return ["andron.andr@gmail.com", "ndrnv4@gmail.com"].includes(email ?? "");
+  return ['andron.andr@gmail.com', 'ndrnv4@gmail.com'].includes(email ?? '');
 };

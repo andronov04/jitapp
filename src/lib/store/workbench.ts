@@ -16,7 +16,6 @@ export const WorkbenchStore = types
     // },
   }))
   .actions((self) => {
-
     const updateState = (state: any, status?: string) => {
       self.status = status ?? self.status;
       if (!self.currentState?.id) {
