@@ -4,7 +4,7 @@ import prisma from '@/prisma';
 import { generateTitleFromUserMessage } from '@/lib/actions/chat';
 import { auth } from '@/lib/supabase/auth';
 
-export const maxDuration = 60;
+export const maxDuration = 360;
 
 export async function POST(request: Request) {
   const {
@@ -13,11 +13,14 @@ export async function POST(request: Request) {
     messages,
   }: { input: string; boxId: string; messages: any[] } = await request.json();
 
-  const currentUser = await auth();
-
-  if (!currentUser || !currentUser.id) {
-    return new Response('Unauthorized', { status: 401 });
+  const currentUser = {
+    id: "9f4c4ae6-ac38-478d-a330-6ab6985b6092",
   }
+  // const currentUser = await auth();
+  //
+  // if (!currentUser || !currentUser.id) {
+  //   return new Response('Unauthorized', { status: 401 });
+  // }
 
   // const ge
   const title = await generateTitleFromUserMessage({

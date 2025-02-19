@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import PreviewTool from '@/components/tools/preview-tool';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import CodeTool from "@/components/tools/code-tool";
 
 const WorkbenchView = observer(
   ({ workbench, count }: { workbench: IWorkbenchStore; count: number }) => {
@@ -73,11 +74,15 @@ const WorkbenchView = observer(
                           'basis-full flex-grow flex-col h-full w-full',
                         )}
                       >
-                        {workbench.currentState?.getFiles.map((file) => (
-                          <div key={file.key}>
-                            {file.key}-<pre>{file.content}</pre>
-                          </div>
-                        ))}
+                        <CodeTool
+                          status={workbench.status}
+                          state={workbench.currentState}
+                        />
+                        {/*{workbench.currentState?.getFiles.map((file) => (*/}
+                        {/*  <div key={file.key}>*/}
+                        {/*    {file.key}-<pre>{file.content}</pre>*/}
+                        {/*  </div>*/}
+                        {/*))}*/}
                       </div>
                     )}
 

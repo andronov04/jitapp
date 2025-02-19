@@ -3,18 +3,19 @@ import { observer } from 'mobx-react-lite';
 import { Button } from '@/components/ui/button';
 import { useStores } from '@/hooks/useStores';
 import CurrentUserDropdown from '@/components/app/current-dropdown-index';
+import AuthModal from '@/components/app/auth-modal';
 
 const AuthBlock = observer(() => {
   const { app } = useStores();
   return (
     <div className="flex items-center gap-4">
       {/*{app.isAuthenticated && <BillingBox />}*/}
-      {/*<AuthModal />*/}
+      <AuthModal />
       {!app.isAuthenticated ? (
         <>
           <Button
             onClick={() => {
-              // app.setModalState("authLogin");
+              app.setModalState('authLogin');
             }}
             size="sm"
             variant="ghost"
@@ -24,7 +25,7 @@ const AuthBlock = observer(() => {
           </Button>
           <Button
             onClick={() => {
-              // app.setModalState("authSignup");
+              app.setModalState('authSignup');
             }}
             size="sm"
             className="h-auto rounded-full py-1"

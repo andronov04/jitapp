@@ -24,7 +24,7 @@ const PreviewTool = observer(
     return (
       <div className="bg-gray-200 flex-grow flex flex-col h-full w-full dark:bg-gray-800 overflow-hidden">
         {/* Toolbar */}
-        <div className="bg-white dark:bg-gray-900 px-2 py-2 flex items-center space-x-2">
+        <div className="bg-white  h-9 dark:bg-gray-900 px-2 py-1 flex items-center space-x-2">
           <div className="flex space-x-2">
             <button
               onClick={() => setHide(!hide)}
@@ -39,8 +39,8 @@ const PreviewTool = observer(
               <RotateCw size={20} />
             </button>
           </div>
-          <div className="flex-grow truncate h-full">
-            <div className="bg-gray-100 truncate text-sm text-gray-600 dark:text-gray-300  dark:bg-gray-700 rounded-full px-4 py-1 flex items-center">
+          <div className="flex-grow truncate h-full flex items-center">
+            <div className="bg-gray-100 w-full  truncate text-sm text-gray-600 dark:text-gray-300  dark:bg-gray-700 rounded-full px-4 py-1 flex items-center">
               {url}
             </div>
           </div>

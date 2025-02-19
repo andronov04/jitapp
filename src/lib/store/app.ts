@@ -13,44 +13,6 @@ import { GeneratorStore } from '@/lib/store/generator';
 
 let appStore: IAppStore | undefined;
 
-// const UserModel = types
-//   .model({
-//     id: types.identifier,
-//     avatar: types.maybeNull(types.string),
-//     name: types.maybeNull(types.string),
-//     username: types.string,
-//     email: types.string,
-//     plan: types.optional(types.string, "free"),
-//     credits: types.optional(types.number, 0),
-//     requestedPlan: types.optional(types.boolean, false),
-//     role: types.optional(
-//       types.model({
-//         id: types.number,
-//         name: types.maybeNull(types.string),
-//       }),
-//       {
-//         id: 2,
-//         name: "user",
-//       },
-//     ),
-//     status: types.optional(
-//       types.model({
-//         id: types.number,
-//         name: types.maybeNull(types.string),
-//       }),
-//       {
-//         id: 1,
-//         name: "active",
-//       },
-//     ),
-//   })
-//   .actions((self) => {
-//     const updateRequestedPlan = (val: boolean) => {
-//       self.requestedPlan = val;
-//     };
-//     return { updateRequestedPlan };
-//   });
-
 const AppStore = types
   .model({
     currentBox: types.maybeNull(BoxStore),
@@ -58,32 +20,8 @@ const AppStore = types
     users: types.array(UserStore),
     generators: types.array(GeneratorStore),
     currentUser: types.safeReference(UserStore),
-    // light: false,
-    // authLoaded: false,
-    // modalState: types.optional(types.string, ""),
-    // currentUser: types.maybeNull(UserModel),
-    // layouts: types.optional(types.map(LayoutStore), {}),
-    // models: types.optional(
-    //   types.array(
-    //     types
-    //       .model({
-    //         id: types.number,
-    //         name: types.maybeNull(types.string),
-    //         provider: types.maybeNull(types.string),
-    //         key: types.maybeNull(types.string),
-    //         active: types.maybeNull(types.boolean),
-    //         isFree: types.optional(types.boolean, false),
-    //         bg: types.optional(types.frozen(), {}),
-    //         meta: types.optional(types.frozen(), {}),
-    //       })
-    //       .views((self) => ({
-    //         get index() {
-    //           return self.meta.sort || 0;
-    //         },
-    //       })),
-    //   ),
-    //   [],
-    // ),
+    authLoaded: false,
+    modalState: types.optional(types.string, ''),
   })
   .views((self) => ({
     get isAuthenticated() {
@@ -106,12 +44,12 @@ const AppStore = types
     const updateCurrentBox = (box: any) => {
       // TODO better this and add current user
       const users = box.messages
-        .map((msg) => [msg, ...msg.children.flat()])
+        .map((msg: any) => [msg, ...msg.children.flat()])
         .flat()
-        .map((a) => a.user)
-        .filter((a) => a);
+        .map((a: any) => a.user)
+        .filter((a: any) => a);
       console.log('userss', users);
-      users.map((a) => addOrUpdateUser(a));
+      users.map((a: any) => addOrUpdateUser(a));
       self.currentBox = { ...box, originalId: box.id };
     };
 
@@ -119,34 +57,15 @@ const AppStore = types
       self.currentBox = { ...box, originalId: box.id };
     };
 
-    // const afterCreate = () => {
-    //   // TODO load from database
-    //   // self.layouts.put({ id: 4, views: ["web", "code"] });
-    // };
-    // const addLayout = (layout: any) => {
-    //   if (self.layouts.has(layout.id)) return;
-    //   self.layouts.put(layout);
-    // };
-    // const setActiveLayout = (id: number) => {
-    //   // const layout = self.layouts.get(id);
-    //   // if (layout) {
-    //   //   layout.active = true;
-    //   // }
-    //   (values(self.layouts) as any).forEach((layout: any) => {
-    //     layout.active = layout.id === id;
-    //   });
-    // };
-    // const setModalState = (state: string) => {
-    //   self.modalState = state;
-    // };
-    // const setUser = (user?: any) => {
-    //   self.currentUser = user;
-    //   self.authLoaded = true;
-    // };
-    // const getModelById = (id: number) => {
-    //   return self.models.find((model) => model.id === id);
-    // };
-    return { updateCurrentBox, updateFirstCurrentBox, addOrUpdateUser };
+    const setModalState = (state: string) => {
+      self.modalState = state;
+    };
+    return {
+      setModalState,
+      updateCurrentBox,
+      updateFirstCurrentBox,
+      addOrUpdateUser,
+    };
   });
 
 export type IAppStore = Instance<typeof AppStore>;

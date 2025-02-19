@@ -13,15 +13,23 @@ import { toast } from 'sonner';
 import { useStores } from '@/hooks/useStores';
 import AvatarBlock from '@/components/common/avatar-block';
 import { isAdmin } from '@/lib/utils';
+import {createSupabaseBrowser} from "@/lib/supabase/client";
+import {useRouter} from "next/navigation";
 
 const CurrentUserDropdown = observer(() => {
   const { app } = useStores();
+  const router = useRouter();
   if (!app.currentUser) {
     return <div></div>;
   }
 
   const handleLogout = async () => {
-    // const resp = await createSupabaseClient().auth.signOut();
+    const resp = await createSupabaseBrowser().auth.signOut();
+    if (resp.error) {
+      toast.error(resp.error.message);
+    } else {
+      router.refresh();
+    }
   };
   return (
     <div className="h-6 w-6">

@@ -5,7 +5,6 @@ import { DEFAULT_MODEL_NAME } from '@/lib/ai/models';
 import LogoBlock from '@/components/common/logo-block';
 import { Button } from '@/components/ui/button';
 import { PlusIcon } from 'lucide-react';
-import { CodeView } from '@/components/view/code-view';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 //  <header className="flex sticky top-0 bg-background py-1.5 items-center px-2 md:px-2 gap-2"></header
@@ -65,7 +64,7 @@ export function ContainerView({
           </header>
 
           <div>
-            <CodeView />
+            {/*<CodeView />*/}
           </div>
         </div>
       </div>
