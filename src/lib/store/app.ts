@@ -112,11 +112,11 @@ const AppStore = types
         .filter((a) => a);
       console.log('userss', users);
       users.map((a) => addOrUpdateUser(a));
-      self.currentBox = box;
+      self.currentBox = {...box, originalId: box.id};
     };
 
     const updateFirstCurrentBox = (box: any) => {
-      self.currentBox = box;
+      self.currentBox = {...box, originalId: box.id};
     }
 
     // const afterCreate = () => {

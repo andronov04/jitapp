@@ -23,7 +23,7 @@ const WorkbenchView = observer(
           <div key={workbench.id} className={
             cn(count> 1 ? "wb-part-min-height wb-part-max-height" : "wb-full-min-height wb-full-max-height", "h-full  flex flex-col w-full")
           }>
-            {/*<div className="px-2 mb-1 font-normal">{workbench.model?.name}/{workbench.generator?.name}</div>*/}
+            {/*<div className="px-2 mb-1 font-normal">{workbench.message}</div>*/}
             <div className="bg-secondary flex flex-col overflow-hidden w-full flex-grow rounded-lg">
               <Tabs onValueChange={setActiveTab} defaultValue={activeTab} className="w-full">
                 <TabsList>

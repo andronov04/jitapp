@@ -19,6 +19,7 @@ let boxStore: IBoxStore | undefined;
 export const BoxStore = types
   .model({
     id: types.identifier,
+    originalId: types.optional(types.string, ''),
     slug: types.optional(types.string, ''),
     description: types.optional(types.string, ''),
     empty: types.optional(types.boolean, true),
@@ -30,9 +31,9 @@ export const BoxStore = types
     // isReady
   })
   .views((self) => ({
-    // get getWorkbenches() {
-    //   return Array.from(self.workbenches.values());//.sort((a, b) => b.created.getTime() - a.created.getTime());
-    // },
+    get getId() {
+      return self.originalId || self.id;
+    },
     // get statuses() {
     //   return self.messages.map(m => m.status).map(s => ({status: s, count: self.messages.filter(m => m.status === s).length})).sort((a, b) => b.count - a.count);
     // },
@@ -77,7 +78,7 @@ export const BoxStore = types
 
       const { data, error } = yield fetcher(`/api/v1/chat/create`, {
         input,
-        boxId: self.id,
+        boxId: self.getId,
         messages,
       });
       if (error) {
@@ -145,12 +146,21 @@ export const BoxStore = types
       // }, 2000);
     });
 
+    // const findMessageById = (targetId: string) => {
+    //   for (const message of self.messages) {
+    //     const found = message.findMessageById(targetId);
+    //     if (found) return found;
+    //   }
+    //   return null;
+    // };
+
     const updateState = (messageId: string, state: any, status?: string) => {
       const workbench = self.workbenches.find((wb) => wb.id === messageId);
       if (!workbench) {
         const workbench = WorkbenchStore.create({
           id: messageId, // mix dmeste modelid_plus+pageid
           status: 'created',
+          messageId: messageId,
           tools: [
             ToolStore.create({
               id: 'preview',

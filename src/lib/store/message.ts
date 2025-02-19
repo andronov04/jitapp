@@ -182,13 +182,24 @@ export const MessageStore = types
         state: 'idle',
       });
       yield stream.generateStreaming(
-        (getRoot(self) as any)?.currentBox?.id,
+        (getRoot(self) as any)?.currentBox?.getId,
         self.id,
         streamCallback,
       );
       // // TODO delete stream
     });
-    return { generateStreaming, updateMessage, streamCallback };
+    const findMessageById = (targetId: string) => {
+      if (self.id === targetId) {
+        return self;
+      }
+      for (const child of self.children) {
+        const found = child.findMessageById(targetId);
+        if (found) return found;
+      }
+      return null;
+    };
+
+    return { generateStreaming, findMessageById, updateMessage, streamCallback };
   });
 
 export type IMessageStore = Instance<typeof MessageStore>;
