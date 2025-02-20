@@ -47,13 +47,15 @@ export async function GET(request: Request) {
   // TODO: try catch and update message status
 
   let model; // TODO switch key by model
-  if (msg.model?.key.includes('deepseek')) {
+  if (msg.model?.modelKey.includes('deepseek')) {
     // model = deepseek('deepseek-reasoner');
-    model = anthropic('claude-3-5-sonnet-latest');
-    // model = fireworks('accounts/fireworks/models/deepseek-r1');
+    // model = anthropic('claude-3-5-sonnet-latest');
+    model = fireworks('accounts/fireworks/models/deepseek-r1');
     // model = fireworks("accounts/fireworks/models/deepseek-v3");
+  } else if (msg.model?.modelKey.includes('claude')) {
+    model = anthropic('claude-3-5-sonnet-latest');
   } else {
-    model = openAi(msg.model.key);
+    model = openAi(msg.model.modelKey);
   }
   let system; // TODO switch key by generator
   if (msg.generator) {

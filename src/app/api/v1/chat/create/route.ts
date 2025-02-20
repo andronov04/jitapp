@@ -14,8 +14,8 @@ export async function POST(request: Request) {
   }: { input: string; boxId: string; messages: any[] } = await request.json();
 
   const currentUser = {
-    id: "9f4c4ae6-ac38-478d-a330-6ab6985b6092",
-  }
+    id: '69edfe7e-cace-4b9c-b4d1-e3d8f6c46ded',
+  };
   // const currentUser = await auth();
   //
   // if (!currentUser || !currentUser.id) {

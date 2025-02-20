@@ -13,8 +13,8 @@ import { toast } from 'sonner';
 import { useStores } from '@/hooks/useStores';
 import AvatarBlock from '@/components/common/avatar-block';
 import { isAdmin } from '@/lib/utils';
-import {createSupabaseBrowser} from "@/lib/supabase/client";
-import {useRouter} from "next/navigation";
+import { createSupabaseBrowser } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
 
 const CurrentUserDropdown = observer(() => {
   const { app } = useStores();

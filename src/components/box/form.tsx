@@ -8,6 +8,7 @@ import { useBlockSelector } from '@/hooks/use-block';
 import { observer } from 'mobx-react-lite';
 import { useStores } from '@/hooks/useStores';
 import { useRouter } from 'next/navigation';
+import ModelSelector from '@/components/app/model-selector';
 
 const FormView = observer(
   ({
@@ -47,14 +48,13 @@ const FormView = observer(
 
       router.push(`/i/${id || app.currentBox?.id}${!id ? '?t=1' : ''}`);
       // app.currentBox?.setId();
-      const simpleModel = app.models.find(
-        (model) => model.key === 'gpt-4o-mini',
-      );
-      const simpleModel2 = app.models.find(
-        (model) => model.key === 'deepseek-reasoner',
-      );
-      const generatorId = 'bd2ca6f1-b6f8-4334-a8fd-1707209281cd';
-      console.log('handleSubmit', input, event, simpleModel);
+      const selectedModels = app.models.filter((model) => model.selected);
+      if (!selectedModels.length) {
+        return;
+      }
+
+      const generatorId = '086d2374-de38-4f08-afe5-8c202623a382';
+      console.log('handleSubmit', input, event);
       // setIsLoading(true);
       // T9rNRonmfjoVitJk96LHB - double good
       app.currentBox?.addMessage({
@@ -71,28 +71,16 @@ const FormView = observer(
         content: '',
         status: 'initial',
         userId: app.currentUser?.id,
-        children: [
-          {
-            id: generateUuid(),
-            role: 'assistant',
-            status: 'initial',
-            modelId: simpleModel?.id,
-            userId: app.currentUser?.id,
-            generatorId,
-            parentId: oneId,
-            content: ``,
-          },
-          // {
-          //   "id": generateUuid(),
-          //   "role": "assistant",
-          //   status: 'created',
-          //   modelId: simpleModel2?.id,
-          //   userId: app.currentUser?.id,
-          //   generatorId,
-          //   "parentId": oneId,
-          //   "content": ``,
-          // },
-        ] as any,
+        children: selectedModels.map((model) => ({
+          id: generateUuid(),
+          role: 'assistant',
+          status: 'initial',
+          modelId: model?.id,
+          userId: app.currentUser?.id,
+          generatorId,
+          parentId: oneId,
+          content: ``,
+        })) as any,
       });
 
       await app.currentBox?.createChat(input);
@@ -116,8 +104,15 @@ const FormView = observer(
     const isBlockVisible = useBlockSelector((state) => state.isVisible);
 
     return (
-      <div>
-        <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl">
+      <div
+        className={
+          'relative flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl'
+        }
+      >
+        <div className="absolute left-0 px-4 w-full -top-12 h-10">
+          <ModelSelector />
+        </div>
+        <form className={'w-full'}>
           {!isReadonly && (
             <MultimodalInput
               chatId={id || app.currentBox?.id || generateUuid()}

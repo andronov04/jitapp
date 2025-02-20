@@ -3,9 +3,17 @@ import { Instance, SnapshotIn, SnapshotOut, types } from 'mobx-state-tree';
 export const ModelStore = types
   .model({
     id: types.identifier,
-    name: types.string,
-    key: types.string,
-    path: types.optional(types.string, ''),
+    modelKey: types.string,
+    modelLabel: types.string,
+    providerLabel: types.string,
+    providerKey: types.string,
+    headline: types.optional(types.string, ''),
+    description: types.optional(types.string, ''),
+    tags: types.optional(types.array(types.string), []),
+    order: types.optional(types.number, 0),
+    active: types.optional(types.boolean, true),
+    params: types.optional(types.frozen(), {}),
+    selected: types.optional(types.boolean, false),
   })
   .views((self) => ({
     // get getFiles() {
@@ -13,11 +21,11 @@ export const ModelStore = types
     // },
   }))
   .actions((self) => {
-    // const setIndex = (index: string) => {
-    //   self.index = index;
-    // };
+    const setSelected = () => {
+      self.selected = !self.selected;
+    };
 
-    return {};
+    return { setSelected };
   });
 
 export type IModelStore = Instance<typeof ModelStore>;

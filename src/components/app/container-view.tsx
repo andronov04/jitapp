@@ -63,9 +63,7 @@ export function ContainerView({
             </Tabs>
           </header>
 
-          <div>
-            {/*<CodeView />*/}
-          </div>
+          <div>{/*<CodeView />*/}</div>
         </div>
       </div>
     </div>

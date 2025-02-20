@@ -14,8 +14,8 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { useStores } from '@/hooks/useStores';
 import { passwordSchema } from '@/lib/schemas/auth.schema';
-import {createSupabaseBrowser} from "@/lib/supabase/client";
-import {NEXT_PUBLIC_BASE_URL} from "@/constants";
+import { createSupabaseBrowser } from '@/lib/supabase/client';
+import { NEXT_PUBLIC_BASE_URL } from '@/constants';
 
 const FormSchema = z.object({
   email: z.string().email(),
@@ -143,10 +143,10 @@ const AuthView = observer(() => {
             className="shadow-none"
             onClick={async () => {
               await createSupabaseBrowser().auth.signInWithOAuth({
-                provider: "google",
+                provider: 'google',
                 options: {
                   redirectTo: getRedirectUrl(),
-                  scopes: "https://www.googleapis.com/auth/userinfo.email",
+                  scopes: 'https://www.googleapis.com/auth/userinfo.email',
                 },
               });
             }}
@@ -167,7 +167,7 @@ const AuthView = observer(() => {
           <Button
             onClick={async () => {
               await createSupabaseBrowser().auth.signInWithOAuth({
-                provider: "github",
+                provider: 'github',
                 options: {
                   redirectTo: getRedirectUrl(),
                 },

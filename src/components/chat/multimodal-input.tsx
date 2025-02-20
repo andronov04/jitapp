@@ -253,10 +253,10 @@ function PureMultimodalInput({
       />
 
       <div className="absolute bottom-0 p-2 w-fit flex gap-2 flex-row justify-start items-center">
-        <AttachmentsButton fileInputRef={fileInputRef} isLoading={isLoading} />
-        <div className="bg-background rounded-md px-2 py-1 text-xs text-white">
-          GPT-4o
-        </div>
+        {/*<AttachmentsButton fileInputRef={fileInputRef} isLoading={isLoading} />*/}
+        {/*<div className="bg-background rounded-md px-2 py-1 text-xs text-white">*/}
+        {/*  GPT-4o*/}
+        {/*</div>*/}
       </div>
 
       <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end">

@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import {createSupabaseBrowser} from "@/lib/supabase/client";
+import { createSupabaseBrowser } from '@/lib/supabase/client';
 
 export default async function PrivatePage() {
   const supabase = createSupabaseBrowser();

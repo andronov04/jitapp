@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import PreviewTool from '@/components/tools/preview-tool';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import CodeTool from "@/components/tools/code-tool";
+import CodeTool from '@/components/tools/code-tool';
 
 const WorkbenchView = observer(
   ({ workbench, count }: { workbench: IWorkbenchStore; count: number }) => {

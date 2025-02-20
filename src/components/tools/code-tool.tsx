@@ -1,21 +1,32 @@
 'use client';
 import { observer } from 'mobx-react-lite';
 import { IStateStore } from '@/lib/store/state';
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CodeView from './code/code-view';
 
 const CodeTool = observer(
   ({ state, status }: { state: IStateStore | null; status: string }) => {
-
-    const firstFile = state?.getFiles.find(a => a.pathFile.includes("index") || a.pathFile.includes("main"));
+    const firstFile = state?.getFiles.find(
+      (a) => a.pathFile.includes('index') || a.pathFile.includes('main'),
+    );
     return (
       <div className="bg-gray-200 flex-grow flex flex-col h-full w-full dark:bg-gray-800 overflow-hidden">
-        <Tabs defaultValue={firstFile?.key || state?.getFiles?.[0]?.key || "index.html"} className="w-full">
+        <Tabs
+          defaultValue={
+            firstFile?.key || state?.getFiles?.[0]?.key || 'index.html'
+          }
+          className="w-full"
+        >
           <TabsList className="bg-white h-9 dark:bg-gray-900 shadow-none w-full p-0 justify-start rounded-none">
             {/*<TabsTrigger value="account">Account</TabsTrigger>*/}
 
             {state?.getFiles.map((file) => (
-              <TabsTrigger className="data-[state=active]:bg-gray-800 data-[state=active]:shadow-none h-full rounded-none shadow-none" value={file.key}>{file.pathFile || file.key}</TabsTrigger>
+              <TabsTrigger
+                className="data-[state=active]:bg-gray-800 data-[state=active]:shadow-none h-full rounded-none shadow-none"
+                value={file.key}
+              >
+                {file.pathFile || file.key}
+              </TabsTrigger>
             ))}
           </TabsList>
           {state?.getFiles.map((file) => (
@@ -35,7 +46,6 @@ const CodeTool = observer(
               </div>
             </TabsContent>
           ))}
-
         </Tabs>
       </div>
     );

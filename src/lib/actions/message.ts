@@ -49,7 +49,7 @@ export async function getMessageForStream(id: string): Promise<any> {
       model: {
         select: {
           id: true,
-          key: true,
+          modelKey: true,
         },
       },
       generator: {

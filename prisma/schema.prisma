@@ -49,13 +49,19 @@ model Message {
 }
 
 model Model {
-  id        String    @id @default(uuid())
-  name      String
-  provider  String?
-  key       String
-  params    Json?
-  createdAt DateTime  @default(now())
-  messages  Message[]
+  id                String    @id @default(uuid())
+  modelKey          String
+  modelLabel        String
+  providerLabel     String
+  providerKey       String
+  headline          String?
+  description       String?
+  tags              String[]
+  order             Float
+  active            Boolean   @default(true)
+  params            Json?
+  createdAt         DateTime  @default(now())
+  messages          Message[]
 }
 
 model Generator {
