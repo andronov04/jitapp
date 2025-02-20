@@ -8,7 +8,8 @@ import React from 'react';
 import { StoreWrapper } from '@/lib/providers/store-provider';
 import { getModels } from '@/lib/actions/model';
 import { ReactScan } from '@/app/ReactScan';
-import { auth } from '@/lib/supabase/auth';
+import { auth } from '@/lib/actions/auth';
+import { getSimpleGenerators } from '@/lib/actions/generator';
 
 const roboto = Roboto({
   subsets: ['latin'],
@@ -46,6 +47,7 @@ export default async function RootLayout({
   // { currentUser, models, authLoaded: true }
   // getModels();
   const models = await getModels();
+  const generators = await getSimpleGenerators();
   const currentUser = await auth();
   const users = [];
   if (currentUser) {
@@ -83,6 +85,7 @@ export default async function RootLayout({
             app={{
               models,
               users,
+              generators,
               currentUser: currentUser?.id,
               currentBox: { id: generateUuid() },
             }}

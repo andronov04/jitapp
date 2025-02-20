@@ -52,11 +52,12 @@ const FormView = observer(
       if (!selectedModels.length) {
         return;
       }
+      const firstGenerator = app.generators[0];
+      if (!firstGenerator) {
+        return;
+      }
 
-      const generatorId = '086d2374-de38-4f08-afe5-8c202623a382';
       console.log('handleSubmit', input, event);
-      // setIsLoading(true);
-      // T9rNRonmfjoVitJk96LHB - double good
       app.currentBox?.addMessage({
         id: generateUuid(),
         content: input,
@@ -77,14 +78,14 @@ const FormView = observer(
           status: 'initial',
           modelId: model?.id,
           userId: app.currentUser?.id,
-          generatorId,
+          generatorId: firstGenerator.id,
           parentId: oneId,
           content: ``,
         })) as any,
       });
 
       await app.currentBox?.createChat(input);
-      // setInput("");
+      setInput('');
       // if ((app.currentBox?.messages?.length || 0) > 0) {
       //   setInput("");
       //   app.currentBox?.startStream();
@@ -109,9 +110,9 @@ const FormView = observer(
           'relative flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl'
         }
       >
-        <div className="absolute left-0 px-4 w-full -top-12 h-10">
-          <ModelSelector />
-        </div>
+        {/*<div className="absolute left-0 px-4 w-full -top-12 h-10">*/}
+        {/*  <ModelSelector/>*/}
+        {/*</div>*/}
         <form className={'w-full'}>
           {!isReadonly && (
             <MultimodalInput
@@ -129,6 +130,9 @@ const FormView = observer(
             />
           )}
         </form>
+        <div className="absolute left-0 px-4 w-full -bottom-8 h-10">
+          <ModelSelector />
+        </div>
       </div>
     );
   },

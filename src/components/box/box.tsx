@@ -14,6 +14,7 @@ import { useStores } from '@/hooks/useStores';
 import { generateUuid } from '@/lib/utils';
 import { useDebounceValue, useLocalStorage } from 'usehooks-ts';
 import { setCookies } from '@/lib/actions/cookies';
+import BaseHeader from '@/components/common/base-header';
 
 const Box = observer(({ data, config }: { data?: any; config?: any }) => {
   const { app } = useStores();
@@ -81,8 +82,8 @@ const Box = observer(({ data, config }: { data?: any; config?: any }) => {
 
   return (
     <div className="flex flex-col">
-      <header className="h-12 sticky top-0 bg-background z-30 border-b flex justify-between items-center px-4 shadow-sm">
-        <div className="flex items-center justify-between gap-2">
+      <BaseHeader>
+        <>
           <LogoBlock />
           <BoxIcon />
           <div className="text-sm">
@@ -108,11 +109,8 @@ const Box = observer(({ data, config }: { data?: any; config?: any }) => {
               {millify(app.currentBox?.numLikes || 0)}
             </span>
           </Button>
-        </div>
-        <div className="flex w-1/3 items-center justify-end">
-          <AuthBlock />
-        </div>
-      </header>
+        </>
+      </BaseHeader>
 
       {/* CONTAINER for the two panes */}
       <div

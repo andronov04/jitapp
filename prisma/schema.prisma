@@ -7,74 +7,166 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String    @id @default(uuid())
-  username  String
-  email     String
-  createdAt DateTime  @default(now())
-  boxes     Box[]
-  messages  Message[]
+// model User {
+//   id        String    @id @default(uuid())
+//   username  String
+//   email     String
+//   createdAt DateTime  @default(now())
+//   boxes     box[]
+//   messages  message[]
+// }
+model iuser {
+  id                  String    @id @default(uuid())
+  email               String?   @unique() @db.VarChar
+  username            String    @unique() @db.VarChar
+  emailVerified       Boolean   @default(false) @map("email_verified")
+  active              Boolean   @default(true)
+  firstName           String?   @map("first_name") @db.VarChar
+  lastName            String?   @map("last_name") @db.VarChar
+  blocked             Boolean   @default(false)
+  created             DateTime  @default(now()) @map("created") @db.Timestamp(6)
+  updatedAt           DateTime  @default(now()) @map("updated") @db.Timestamp(6)
+  deletedAt           DateTime? @map("deleted") @db.Timestamp(6)
+  password            String?   @db.VarChar
+  provider            String    @default("empty") @db.VarChar
+  socialId            String?   @map("social_id") @db.VarChar
+  name                String?   @db.VarChar
+  description         String?   @db.VarChar
+  roleId              Int?      @default(2) @map("role_id")
+  statusId            Int?      @default(1) @map("status_id")
+  avatar              String?   @db.VarChar
+  lastUpdatedUsername DateTime? @default(now()) @map("last_updated_username") @db.Timestamp(6)
+  migrated            Boolean   @default(false)
+  numRepos            Int       @default(0) @map("num_repos")
+  numForks            Int       @default(0) @map("num_forks")
+  numFollowers        Int       @default(0) @map("num_followers")
+  numFollowings       Int       @default(0) @map("num_followings")
+  metadata            String?   @default("{}") @db.VarChar
+  createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  plan                String    @default("free") @db.VarChar
+  requestedPlan       Boolean   @default(false) @map("requested_plan")
+  credits             BigInt    @default(0)
+
+  boxes    box[]
+  messages message[]
+
+  @@map("iuser")
 }
 
-model Box {
-  id          String    @id @default(uuid())
-  name        String
-  data        Json
-  slug        String    @unique
+model box {
+  id String @id @default(uuid())
+
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamp(6)
+  slug        String    @unique() @db.VarChar
+  customSlug  String?   @unique() @map("custom_slug") @db.VarChar
+  name        String    @db.VarChar
+  searchText  String?   @map("search_text")
+  risked      Boolean   @default(false)
+  processing  Boolean   @default(true)
+  active      Boolean   @default(true)
+  published   Boolean   @default(false)
+  featured    Boolean   @default(false)
+  order       Decimal   @default(0) @db.Decimal(12, 4)
   description String?
-  createdAt   DateTime  @default(now())
-  userId      String?
-  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages    Message[]
+  numLikes    Int       @default(0) @map("num_likes")
+  numMessages Int       @default(0) @map("num_mesages")
+  numViews    Int       @default(0) @map("num_views")
+  score       Decimal   @default(100) @db.Decimal(5, 2)
+  isPrivate   Boolean   @default(false) @map("is_private")
+  meta        Json?
+
+  userId   String?   @map("user_id")
+  user     iuser?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages message[]
+
+  @@map("box_table")
 }
 
-model Message {
+model message {
   id              String     @id @default(uuid())
-  boxId           String
-  modelId         String?
-  generatorId     String?
-  parentMessageId String?
-  userId          String?
+  boxId           String     @map("box_id")
+  modelId         String?    @map("model_id")
+  generatorId     String?    @map("generator_id")
+  parentMessageId String?    @map("parent_message_id")
+  userId          String?    @map("user_id")
   role            String
   kind            String
   status          String
   content         String
-  createdAt       DateTime   @default(now())
-  box             Box        @relation(fields: [boxId], references: [id], onDelete: Cascade)
-  generator       Generator? @relation(fields: [generatorId], references: [id])
-  model           Model?     @relation(fields: [modelId], references: [id])
-  parentMessage   Message?   @relation("MessageToParent", fields: [parentMessageId], references: [id])
-  children        Message[]  @relation("MessageToParent")
-  user            User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamp(6)
+  box             box        @relation(fields: [boxId], references: [id], onDelete: Cascade)
+  generator       generator? @relation(fields: [generatorId], references: [id])
+  model           model?     @relation(fields: [modelId], references: [id])
+  parentMessage   message?   @relation("message_to_parent_table", fields: [parentMessageId], references: [id])
+  children        message[]  @relation("message_to_parent_table")
+  user            iuser?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("message_table")
 }
 
-model Model {
-  id                String    @id @default(uuid())
-  modelKey          String
-  modelLabel        String
-  providerLabel     String
-  providerKey       String
-  headline          String?
-  description       String?
-  tags              String[]
-  order             Float
-  active            Boolean   @default(true)
-  params            Json?
-  createdAt         DateTime  @default(now())
-  messages          Message[]
+model model {
+  id            String    @id @default(uuid())
+  modelKey      String    @map("model_key")
+  modelLabel    String    @map("model_label")
+  providerLabel String    @map("provider_label")
+  providerKey   String    @map("provider_key")
+  headline      String?
+  description   String?
+  tags          String[]
+  order         Float
+  active        Boolean   @default(true)
+  params        Json?
+  // private data
+  data          Json      @default("{}")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  messages      message[]
+
+  @@map("model_table")
 }
 
-model Generator {
+model genPrivate {
+  id             String      @id @default(uuid())
+  generators     generator[]
+  createdAt      DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  seoWords       String[]    @map("seo_words") @db.VarChar
+  systemTmpl     String?     @map("system_tmpl") @db.VarChar
+  systemNextTmpl String?     @map("system_next_tmpl") @db.VarChar
+
+  @@map("gen_private_table")
+}
+
+model generator {
   id          String    @id @default(uuid())
-  name        String
-  description String?
-  params      Json?
-  createdAt   DateTime  @default(now())
-  messages    Message[]
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime? @map("updated_at") @db.Timestamptz(6)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamp(6)
+  tools       String[]
+  slug        String    @unique() @db.VarChar
+  active      Boolean   @default(true)
+  published   Boolean   @default(false)
+  isMain      Boolean   @default(false) @map("is_main")
+  order       Decimal   @default(0) @db.Decimal(12, 4)
+  meta        Json?
+  content     Json?
+  numBoxes    Int?      @default(0) @map("num_boxes")
+  numMessages Int?      @default(0) @map("num_messages")
+  markdown    String?
+
+  messages message[]
+
+  genPrivateId String?     @map("gen_private_id")
+  genPrivate   genPrivate? @relation(fields: [genPrivateId], references: [id], onUpdate: NoAction)
+
+  @@map("generator_table")
 }
 
-model State {
+model state {
   id        String   @id @default(uuid())
+  // slug            String        @unique() @db.VarChar
   data      Json
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("state_table")
 }

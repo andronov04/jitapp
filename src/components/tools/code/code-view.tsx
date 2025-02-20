@@ -106,8 +106,7 @@ const CodeView = observer(
         <CodeMirror
           theme={theme || th.resolvedTheme === 'dark' ? basicDark : basicLight}
           value={code}
-          readOnly={false}
-          // readOnly={repo.isBusy || repo.isGenerating || !app.isAuthenticated}
+          readOnly={true}
           height={`${height}px`}
           basicSetup={{
             lineNumbers: false,

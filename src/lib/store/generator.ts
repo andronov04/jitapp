@@ -2,7 +2,12 @@ import { Instance, SnapshotIn, SnapshotOut, types } from 'mobx-state-tree';
 
 export const GeneratorStore = types
   .model({
-    id: types.identifierNumber,
+    id: types.identifier,
+    tools: types.optional(types.array(types.string), []),
+    slug: types.string,
+    order: types.union(types.number, types.float),
+    meta: types.optional(types.frozen(), {}),
+    selected: types.optional(types.boolean, false),
   })
   .views((self) => ({
     // get getFiles() {

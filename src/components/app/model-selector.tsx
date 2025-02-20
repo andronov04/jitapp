@@ -27,10 +27,10 @@ const ModelItem = ({ model }: { model: IModelStore }) => {
       <div className="flex flex-row items-center gap-1">
         <img
           alt={model.providerKey}
-          width="18"
-          height="18"
+          width="16"
+          height="16"
           src={`/icons/${model.providerKey}.svg`}
-          className={cn('selector-model-image dark:invert h-4 w-4')}
+          className={cn('selector-model-image dark:invert h-3 w-3')}
         />
         <p className=" opacity-50">{model.providerLabel}</p>
       </div>

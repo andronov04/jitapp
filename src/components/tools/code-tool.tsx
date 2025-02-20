@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { IStateStore } from '@/lib/store/state';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CodeView from './code/code-view';
+import { MessageCircleWarningIcon } from 'lucide-react';
 
 const CodeTool = observer(
   ({ state, status }: { state: IStateStore | null; status: string }) => {
@@ -32,6 +33,10 @@ const CodeTool = observer(
           {state?.getFiles.map((file) => (
             <TabsContent className="p-0 m-0" value={file.key}>
               <div className="flex h-full w-full flex-col">
+                <div className="h-6 flex items-center w-full text-xs truncate  justify-start border-t px-0.5 bg-yellow-500 text-black">
+                  The code editing feature is temporarily disabled and will be
+                  available again soon. Stay tuned!
+                </div>
                 <CodeView
                   code={file.content}
                   fileName={file.pathFile || file.key}
@@ -40,9 +45,10 @@ const CodeTool = observer(
                     // handleCodeChange(f.key, newContent);
                   }}
                 />
-                {/*<div className="flex h-6 min-h-6 w-full  items-center  justify-end border-t px-0.5">*/}
-                {/*  <CopyTooltip text={f.value} />*/}
-                {/*</div>*/}
+                <div className="flex h-6 min-h-6 w-full  items-center  justify-end border-t px-0.5">
+                  {/*<CopyTooltip text={f.value} />*/}
+                  {/*Temporarily edit code disabled, soon will be available, stay tuned!*/}
+                </div>
               </div>
             </TabsContent>
           ))}

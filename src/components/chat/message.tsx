@@ -29,6 +29,7 @@ import { IMessageStore } from '@/lib/store/message';
 import MessageChildren from '@/components/chat/message-children';
 import AvatarBlock from '@/components/common/avatar-block';
 import SparkleIcon from '@/components/common/sparkle-icon';
+import Link from 'next/link';
 
 const PurePreviewMessage = ({
   chatId,
@@ -84,38 +85,15 @@ const PurePreviewMessage = ({
           )}
 
           <div className="flex flex-col gap-2 w-full">
-            {/*{message.experimental_attachments && (*/}
-            {/*  <div className="flex flex-row justify-end gap-2">*/}
-            {/*    {message.experimental_attachments.map((attachment) => (*/}
-            {/*      <PreviewAttachment*/}
-            {/*        key={attachment.url}*/}
-            {/*        attachment={attachment}*/}
-            {/*      />*/}
-            {/*    ))}*/}
-            {/*  </div>*/}
-            {/*)}*/}
-
             {message.content && message.role === 'user' && (
               <div className="flex flex-row gap-2 items-start">
-                {/*{message.role === 'user' && !isReadonly && (*/}
-                {/*  <TooltipProvider>*/}
-                {/*    <Tooltip>*/}
-                {/*      <TooltipTrigger asChild>*/}
-                {/*        <Button*/}
-                {/*          variant="ghost"*/}
-                {/*          className="px-2 h-fit rounded-full text-muted-foreground opacity-0 group-hover/message:opacity-100"*/}
-                {/*          onClick={() => {*/}
-                {/*            setMode('edit');*/}
-                {/*          }}*/}
-                {/*        >*/}
-                {/*          /!*<PencilEditIcon />*!/*/}
-                {/*        </Button>*/}
-                {/*      </TooltipTrigger>*/}
-                {/*      <TooltipContent>Edit message</TooltipContent>*/}
-                {/*    </Tooltip>*/}
-                {/*  </TooltipProvider>*/}
-                {/*)}*/}
-                <AvatarBlock id={message.user?.id || message.id} />
+                <Link
+                  target={'_blank'}
+                  className="hover:underline"
+                  href={`/${message.user?.username}`}
+                >
+                  <AvatarBlock id={message.user?.id || message.id} />
+                </Link>
 
                 <div
                   className={cn('flex flex-col', {
@@ -123,8 +101,14 @@ const PurePreviewMessage = ({
                       message.role === 'user',
                   })}
                 >
-                  <div className="text-green-600">
-                    @{message.user?.username ?? 'user'}
+                  <div className="text-green-600 font-semibold">
+                    <Link
+                      target={'_blank'}
+                      className="hover:underline"
+                      href={`/${message.user?.username}`}
+                    >
+                      {message.user?.username ?? 'user'}
+                    </Link>
                   </div>
                   <PreMarkdown content={message.content as string} />
                 </div>
@@ -133,22 +117,18 @@ const PurePreviewMessage = ({
 
             {message.role === 'group' && (
               <div className="rounded-xl flex flex-row gap-2 items-start">
-                {/*<AvatarBlock*/}
-                {/*  id={message.id}*/}
-                {/*  customSrc={'https://jit.dev/32x32.png'}*/}
-                {/*/>*/}
                 <div className="w-8 h-8 flex-none flex items-center justify-center rounded-full bg-secondary">
                   <SparkleIcon />
                 </div>
                 <div
                   className={cn(
-                    'flex flex-col bg-secondary px-3 py-2 rounded-xl',
+                    'flex flex-col divide-y-2 divide-dashed divide-background space-y-2 bg-secondary px-3 py-2 rounded-xl',
                   )}
                 >
                   {message.children.map((msg) => (
-                    <div key={msg.id}>
-                      <div className="text-green-600">
-                        {msg.model?.name || 'AI'}
+                    <div key={msg.id} className="pt-1 first:pt-0">
+                      <div className="text-green-600 font-semibold">
+                        {msg.model?.modelLabel || 'AI'}
                       </div>
                       <MessageChildren key={msg.id} message={msg} />
                     </div>
@@ -156,35 +136,6 @@ const PurePreviewMessage = ({
                 </div>
               </div>
             )}
-
-            {/*{message.content && mode === 'edit' && (*/}
-            {/*  <div className="flex flex-row gap-2 items-start">*/}
-            {/*    <div className="size-8" />*/}
-
-            {/*    <MessageEditor*/}
-            {/*      key={message.id}*/}
-            {/*      message={message as any}*/}
-            {/*      setMode={setMode}*/}
-            {/*      setMessages={setMessages}*/}
-            {/*      reload={reload}*/}
-            {/*    />*/}
-            {/*  </div>*/}
-            {/*)}*/}
-
-            {/*{!isReadonly && (*/}
-            {/*  <MessageActions*/}
-            {/*    key={`action-${message.id}`}*/}
-            {/*    chatId={chatId}*/}
-            {/*    message={message}*/}
-            {/*    vote={vote}*/}
-            {/*    isLoading={isLoading}*/}
-            {/*  />*/}
-            {/*)}*/}
-            {/*{message.role === 'assistant' && (*/}
-            {/*  <div className={"text-muted-foreground text-xs"}>*/}
-            {/*  gpt-4o*/}
-            {/*  </div>*/}
-            {/*)}*/}
           </div>
         </div>
       </motion.div>

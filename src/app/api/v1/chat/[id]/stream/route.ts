@@ -59,8 +59,12 @@ export async function GET(request: Request) {
   }
   let system; // TODO switch key by generator
   if (msg.generator) {
-    system = getSystemPrompt('/home/user');
+    system = msg.generator.genPrivate.systemTmpl; //getSystemPrompt('/home/user');
     // system = getSystemPrompt(msg.generator.name);
+  }
+
+  if (!system) {
+    return new Response('Prompt is not found', { status: 400 });
   }
 
   let fitMessages = [];

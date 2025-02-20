@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { generateId } from '@/lib/utils';
 import prisma from '@/prisma';
 import { generateTitleFromUserMessage } from '@/lib/actions/chat';
-import { auth } from '@/lib/supabase/auth';
+import { auth } from '@/lib/actions/auth';
 
 export const maxDuration = 360;
 
@@ -13,14 +13,11 @@ export async function POST(request: Request) {
     messages,
   }: { input: string; boxId: string; messages: any[] } = await request.json();
 
-  const currentUser = {
-    id: '69edfe7e-cace-4b9c-b4d1-e3d8f6c46ded',
-  };
-  // const currentUser = await auth();
-  //
-  // if (!currentUser || !currentUser.id) {
-  //   return new Response('Unauthorized', { status: 401 });
-  // }
+  const currentUser = await auth();
+
+  if (!currentUser || !currentUser.id) {
+    return new Response('Unauthorized', { status: 401 });
+  }
 
   // const ge
   const title = await generateTitleFromUserMessage({
@@ -41,7 +38,6 @@ export async function POST(request: Request) {
         description: '',
         createdAt: new Date(),
         slug: generateId(),
-        data: {},
       },
     });
   }

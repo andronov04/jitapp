@@ -55,7 +55,11 @@ export async function getMessageForStream(id: string): Promise<any> {
       generator: {
         select: {
           id: true,
-          name: true,
+          genPrivate: {
+            select: {
+              systemTmpl: true,
+            },
+          },
         },
       },
     },
