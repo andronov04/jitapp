@@ -61,3 +61,54 @@ export async function getBoxStateBySlug(slug: string) {
     messages,
   };
 }
+
+export async function getFeaturedBoxes() {
+  const _items = await prisma.box.findMany({
+    where: {
+      active: true,
+      // featured: true,
+      risked: false,
+    },
+    orderBy: {
+      createdAt: 'asc',
+    },
+    select: {
+      order: true,
+      score: true,
+      id: true,
+      name: true,
+      meta: true,
+      featured: true,
+      slug: true,
+      createdAt: true,
+      description: true,
+      numLikes: true,
+      numMessages: true,
+      numViews: true,
+      userId: true,
+      user: {
+        select: {
+          id: true,
+          username: true,
+          avatar: true,
+        },
+      },
+      useModels: {
+        select: {
+          id: true,
+        },
+      },
+      useGenerators: {
+        select: {
+          id: true,
+        },
+      },
+    },
+    take: 25,
+  });
+  return _items.map((item) => ({
+    ...item,
+    order: parseInt(item.order as any),
+    score: parseFloat(item.score as any),
+  }));
+}

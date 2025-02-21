@@ -4,6 +4,51 @@ import { getSystemPrompt } from '@/lib/llm/llm/prompts';
 const prisma = new PrismaClient();
 
 async function main() {
+  //
+  // const box = await prisma.box.findFirst({
+  //   where: {
+  //     id: "1b947572-b736-4fd1-b88a-630d16cee9ef"
+  //   }
+  // });
+  // if (box) {
+  //   const messages = await prisma.message.findMany({
+  //     where: {
+  //       boxId: box.id,
+  //     },
+  //   });
+  //   const modelIds = messages
+  //     .map((message) => message.modelId)
+  //     .filter((id): id is string => Boolean(id));
+  //   console.log(modelIds);
+  //   const generatorIds = messages
+  //     .map((message) => message.generatorId)
+  //     .filter((id): id is string => Boolean(id));
+  //   console.log([...new Set(generatorIds)]);
+  //
+  //   if (modelIds.length > 0) {
+  //     // «Подключаем» (connect) все модели к боксу (Many-to-Many)
+  //     await prisma.box.update({
+  //       where: { id: box.id },
+  //       data: {
+  //         useModels: {
+  //           connect: modelIds.map((id) => ({ id })),
+  //         },
+  //       },
+  //     });
+  //   }
+  //   if (generatorIds.length > 0) {
+  //     await prisma.box.update({
+  //       where: { id: box.id },
+  //       data: {
+  //         useGenerators: {
+  //           connect: [...new Set(generatorIds)].map((id) => ({ id })),
+  //         },
+  //       },
+  //     });
+  //   }
+  // }
+  //
+  // return;
   const models = [
     {
       id: '505680da-28ba-4dc9-873b-036387fa938f',

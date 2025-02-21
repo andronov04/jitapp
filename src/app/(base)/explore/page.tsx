@@ -1,5 +1,7 @@
 import { Suspense } from 'react';
 import { Metadata, ResolvingMetadata } from 'next';
+import ExploreView from '@/components/app/explore-view';
+import { getFeaturedBoxes } from '@/lib/actions/box';
 
 export async function generateMetadata(
   _params: any,
@@ -7,12 +9,12 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const p = await parent;
   return {
-    title: 'Explore code generations',
+    title: 'Explore Chatboxes',
     description: 'Explore code, AI trends, and connect with the JIT community.',
     robots: 'index, follow',
     openGraph: {
       ...(p.openGraph ?? {}),
-      title: 'Explore code generations',
+      title: 'Explore Chatboxes',
       description:
         'Explore code, AI trends, and connect with the JIT community.',
       url: 'https://jit.dev/explore',
@@ -21,5 +23,10 @@ export async function generateMetadata(
 }
 
 export default async function Page() {
-  return <main className="main">Explore</main>;
+  const items = await getFeaturedBoxes();
+  return (
+    <main className="main">
+      <ExploreView items={items} />
+    </main>
+  );
 }

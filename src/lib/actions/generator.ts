@@ -20,7 +20,16 @@ export async function getSimpleGenerators() {
     id: item.id,
     tools: item.tools,
     slug: item.slug,
-    order: parseFloat(item.order),
+    order: parseFloat(item.order as any),
     meta: item.meta,
   }));
+}
+
+export async function getActiveGenerators() {
+  return prisma.generator.findMany({
+    where: {
+      active: true,
+      published: true,
+    },
+  });
 }

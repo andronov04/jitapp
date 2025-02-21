@@ -89,6 +89,9 @@ model box {
   messages message[]
   likes    like[]
 
+  useModels model[] @relation("box_model_relation")
+  useGenerators generator[] @relation("box_generator_relation")
+
   @@map("box_table")
 }
 
@@ -131,6 +134,8 @@ model model {
   createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   messages      message[]
 
+  boxes box[] @relation("box_model_relation")
+
   @@map("model_table")
 }
 
@@ -163,6 +168,7 @@ model generator {
   markdown    String?
 
   messages message[]
+  boxes box[] @relation("box_generator_relation")
 
   genPrivateId String?     @map("gen_private_id")
   genPrivate   genPrivate? @relation(fields: [genPrivateId], references: [id], onUpdate: NoAction)
@@ -184,8 +190,8 @@ model like {
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
   deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
-  userId    String    @map("user_id") @db.Uuid
-  boxId     String    @map("box_id") @db.Uuid
+  userId    String    @map("user_id")
+  boxId     String    @map("box_id")
   iuser     iuser     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   box       box       @relation(fields: [boxId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
