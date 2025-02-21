@@ -41,7 +41,7 @@ const CurrentUserDropdown = observer(() => {
             id={app.currentUser?.id}
           />
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="mr-2 bg-background">
+        <DropdownMenuContent className="mr-2 bg-background shadow-none">
           <DropdownMenuLabel>{app.currentUser.username}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>

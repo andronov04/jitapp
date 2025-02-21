@@ -24,7 +24,7 @@ const PreviewTool = observer(
     return (
       <div className="bg-gray-200 flex-grow flex flex-col h-full w-full dark:bg-gray-800 overflow-hidden">
         {/* Toolbar */}
-        <div className="bg-white  h-9 dark:bg-gray-900 px-2 py-1 flex items-center space-x-2">
+        <div className=" h-9 dark:bg-gray-900 bg-gray-200 px-2 py-1 flex items-center space-x-2">
           <div className="flex space-x-2">
             <button
               onClick={() => setHide(!hide)}

@@ -18,12 +18,12 @@ const CodeTool = observer(
           }
           className="w-full"
         >
-          <TabsList className="bg-white h-9 dark:bg-gray-900 shadow-none w-full p-0 justify-start rounded-none">
+          <TabsList className="bg-gray-200 h-9 dark:bg-gray-900 shadow-none w-full p-0 justify-start rounded-none">
             {/*<TabsTrigger value="account">Account</TabsTrigger>*/}
 
             {state?.getFiles.map((file) => (
               <TabsTrigger
-                className="data-[state=active]:bg-gray-800 data-[state=active]:shadow-none h-full rounded-none shadow-none"
+                className="data-[state=active]:bg-gray-300 dark:data-[state=active]:bg-gray-800 data-[state=active]:shadow-none h-full rounded-none shadow-none"
                 value={file.key}
               >
                 {file.pathFile || file.key}

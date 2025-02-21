@@ -16,7 +16,7 @@ export default function ArtifactView({ messageId }: { messageId: string }) {
         }
       }}
       variant="outline"
-      className="flex items-center my-1.5 gap-2"
+      className="flex items-center shadow-none my-1.5 gap-2"
     >
       Show
       <ArrowRightIcon className="mr-2 h-4 w-4" />

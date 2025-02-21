@@ -21,20 +21,24 @@ import {
 import { useMemo, useState } from 'react';
 import { IModelStore } from '@/lib/store/model';
 import ModelItem from '@/components/app/model-item';
+import Link from 'next/link';
 
-const ModelSelector = observer(() => {
+const ModelSelector = observer(({ kind = 'form' }: { kind?: string }) => {
   const { app } = useStores();
   const [open, setOpen] = useState(false);
 
   return (
-    <div className=" w-full flex justify-end items-center h-full ">
+    <div className=" w-full gap-2 flex justify-end items-center h-full ">
+      {kind === 'main' && (
+        <div className="label-new-feature text-sm">New feature! Compare →</div>
+      )}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-auto justify-between h-11 rounded-2xl"
+            className="w-auto shadow-none justify-between h-11 rounded-2xl"
           >
             <div className="flex flex-row items-center gap-4">
               {app.models
@@ -51,7 +55,7 @@ const ModelSelector = observer(() => {
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="bg-background p-0">
+        <PopoverContent className="bg-background shadow-none p-0">
           <Command className="bg-background">
             <CommandInput placeholder="Search models..." />
             <CommandList>
@@ -78,6 +82,12 @@ const ModelSelector = observer(() => {
               </CommandGroup>
             </CommandList>
           </Command>
+          <div className="border-t px-4 text-xs py-2">
+            How does the compare feature work, and what are its advantages?{' '}
+            <Link href="/faq" className="hover:opacity-80 inline underline">
+              Learn more
+            </Link>
+          </div>
         </PopoverContent>
       </Popover>
     </div>

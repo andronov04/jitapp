@@ -124,3 +124,11 @@ body {
 .main {
   @apply mx-auto w-full px-2 max-w-6xl py-8;
 }
+
+.label-new-feature {
+  background: linear-gradient(93.44deg, #FF1212 -2.62%, #C82EB8 106.97%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}

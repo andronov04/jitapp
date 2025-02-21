@@ -14,8 +14,10 @@ import { FailedAlert } from '@/components/app/failed-alert';
 const FormView = observer(
   ({
     id,
+    kind = 'form',
   }: {
     id?: string;
+    kind?: string;
   }) => {
     const { app } = useStores();
 
@@ -117,7 +119,7 @@ const FormView = observer(
           )}
 
           <div className="absolute left-0 px-4 w-full -top-12 h-10">
-            <ModelSelector />
+            <ModelSelector kind={kind} />
           </div>
           <form className={'w-full'}>
             {!isReadonly && (
