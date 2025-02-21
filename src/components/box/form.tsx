@@ -9,6 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useStores } from '@/hooks/useStores';
 import { useRouter } from 'next/navigation';
 import ModelSelector from '@/components/app/model-selector';
+import { FailedAlert } from '@/components/app/failed-alert';
 
 const FormView = observer(
   ({
@@ -79,7 +80,7 @@ const FormView = observer(
           modelId: model?.id,
           userId: app.currentUser?.id,
           generatorId: firstGenerator.id,
-          parentId: oneId,
+          parentMessageId: oneId,
           content: ``,
         })) as any,
       });
@@ -105,33 +106,40 @@ const FormView = observer(
     const isBlockVisible = useBlockSelector((state) => state.isVisible);
 
     return (
-      <div
-        className={
-          'relative flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl'
-        }
-      >
-        {/*<div className="absolute left-0 px-4 w-full -top-12 h-10">*/}
-        {/*  <ModelSelector/>*/}
-        {/*</div>*/}
-        <form className={'w-full'}>
-          {!isReadonly && (
-            <MultimodalInput
-              chatId={id || app.currentBox?.id || generateUuid()}
-              input={input}
-              setInput={setInput}
-              handleSubmit={handleSubmit}
-              isLoading={app.currentBox?.isProcessing || false}
-              stop={() => {}}
-              attachments={[]}
-              setAttachments={() => {}}
-              messages={[]}
-              setMessages={() => {}}
-              append={() => {}}
-            />
+      <div>
+        <div
+          className={
+            'relative flex flex-col mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl'
+          }
+        >
+          {app.currentBox?.failed && (
+            <FailedAlert data={app.currentBox.failed} />
           )}
-        </form>
-        <div className="absolute left-0 px-4 w-full -bottom-8 h-10">
-          <ModelSelector />
+
+          <div className="absolute left-0 px-4 w-full -top-12 h-10">
+            <ModelSelector />
+          </div>
+          <form className={'w-full'}>
+            {!isReadonly && (
+              <MultimodalInput
+                chatId={id || app.currentBox?.id || generateUuid()}
+                input={input}
+                setInput={setInput}
+                handleSubmit={handleSubmit}
+                isLoading={app.currentBox?.isProcessing || false}
+                isBusy={app.currentBox?.isBusy || false}
+                stop={() => {}}
+                attachments={[]}
+                setAttachments={() => {}}
+                messages={[]}
+                setMessages={() => {}}
+                append={() => {}}
+              />
+            )}
+          </form>
+          {/*<div className="absolute left-0 px-4 w-full -bottom-8 h-10">*/}
+          {/*  <ModelSelector />*/}
+          {/*</div>*/}
         </div>
       </div>
     );

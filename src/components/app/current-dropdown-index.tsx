@@ -47,7 +47,7 @@ const CurrentUserDropdown = observer(() => {
           <DropdownMenuItem>
             <Link
               className="w-full hover:underline"
-              href={`/${app.currentUser.username}`}
+              href={`/@${app.currentUser.username}`}
             >
               Profile
             </Link>

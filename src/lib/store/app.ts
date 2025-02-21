@@ -7,9 +7,10 @@ import {
 } from 'mobx-state-tree';
 import { values } from 'mobx';
 import { BoxStore } from '@/lib/store/box';
-import { ModelStore } from '@/lib/store/model';
+import { IModelStore, ModelStore } from '@/lib/store/model';
 import { IUserStore, UserStore } from '@/lib/store/user';
 import { GeneratorStore } from '@/lib/store/generator';
+import { findRecursive } from '../utils';
 
 let appStore: IAppStore | undefined;
 
@@ -50,7 +51,12 @@ const AppStore = types
         .filter((a: any) => a);
       console.log('userss', users);
       users.map((a: any) => addOrUpdateUser(a));
+      console.log('{ ...box, originalId: box.id }', {
+        ...box,
+        originalId: box.id,
+      });
       self.currentBox = { ...box, originalId: box.id };
+      self.currentBox?.recalculateMsgStatus();
     };
 
     const updateFirstCurrentBox = (box: any) => {
@@ -60,7 +66,16 @@ const AppStore = types
     const setModalState = (state: string) => {
       self.modalState = state;
     };
+
+    const getModelByStateId = (stateId: string): IModelStore | null => {
+      const msg = findRecursive(self.currentBox?.messages ?? [], stateId);
+      if (!msg) return null;
+      return self.models.find((model) => model.id === msg.modelId) || null;
+      // return self.models.find((model) => model.stateId === stateId);
+    };
+
     return {
+      getModelByStateId,
       setModalState,
       updateCurrentBox,
       updateFirstCurrentBox,

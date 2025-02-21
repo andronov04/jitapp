@@ -15,6 +15,7 @@ import { createMessageParser } from '@/lib/runtime/create-parser';
 import { IUserStore, UserStore } from '@/lib/store/user';
 import { IModelStore } from '@/lib/store/model';
 import { IGeneratorStore } from '@/lib/store/generator';
+import { createFetchError } from '@/lib/utils';
 
 export const StreamStore = types
   .model({
@@ -22,9 +23,9 @@ export const StreamStore = types
     netContent: types.optional(types.string, ''), // Хранилище сообщений
     state: types.enumeration('State', [
       'idle',
-      'pending',
+      'streaming',
       'completed',
-      'error',
+      'failed',
     ]),
   })
   .actions((self) => {
@@ -36,8 +37,8 @@ export const StreamStore = types
         messageId: string,
         streamCallback: (type: string, value: any, status?: string) => void,
       ) {
-        self.state = 'pending';
-        streamCallback('status', 'pending');
+        self.state = 'streaming';
+        streamCallback('status', null, 'streaming');
 
         abortController = new AbortController(); // Создаём AbortController
         const signal = abortController.signal; // Получаем AbortSignal
@@ -51,8 +52,12 @@ export const StreamStore = types
             },
           );
 
-          if (!response.ok) throw new Error('Error fetching stream');
-          if (!response.body) throw new Error('❌ Нет потока данных!');
+          if (!response.ok || !response.body) {
+            const error = yield createFetchError(response);
+            streamCallback('status', error, 'failed');
+            return;
+          }
+          // if (!response.body) throw new Error('❌ Нет потока данных!');
 
           const reader = response.body.getReader();
           const decoder = new TextDecoder();
@@ -85,13 +90,13 @@ export const StreamStore = types
 
           self.state = 'completed';
           streamCallback('state', parseArtifacts(textBuffer), self.state);
-          // streamCallback('status', 'completed');
+          streamCallback('status', null, 'completed');
         } catch (error) {
           if (signal.aborted) {
           } else {
-            self.state = 'error';
+            self.state = 'failed';
           }
-          // streamCallback('status', 'error');
+          streamCallback('status', null, 'failed');
         }
       }),
 
@@ -116,12 +121,18 @@ export const MessageStore = types
     // userId: types.safeReference(UserStore),
     // user: types.safeReference(UserStore),
     isProcessing: types.optional(types.boolean, false),
-    status: types.optional(types.string, 'initial'), // streaming, ready, failed
-    parentId: types.maybeNull(types.string), // ID родителя
+    status: types.optional(types.string, 'initial'), // streaming, completed, failed, created, cancelled
+    parentMessageId: types.maybeNull(types.string), // ID родителя
     children: types.optional(
       types.array(types.late((): any => MessageStore)),
       [],
-    ), // Дети (late для рекурсии)
+    ),
+    failed: types.maybeNull(
+      types.model({
+        message: types.optional(types.string, ''),
+        code: types.union(types.string, types.number),
+      }),
+    ),
   })
   .views((self) => ({
     get hasChildren() {
@@ -153,7 +164,8 @@ export const MessageStore = types
     },
     get fullContent() {
       // TODO fix it, once use, before create
-      return self.status === 'ready'
+      return (self.status === 'ready' || self.status === 'completed') &&
+        self.role === 'assistant'
         ? createMessageParser().parse(self.id, self.content)?.output
         : self.content;
     },
@@ -163,18 +175,35 @@ export const MessageStore = types
       self.status = message.status || self.status;
     };
 
+    const handleChangeStatus = (prevStatus: string) => {
+      if (self.status !== prevStatus && self.parentMessageId) {
+        try {
+          self.root?.currentBox?.recalculateMsgStatus();
+        } catch (e) {
+          console.error('recalculateMsgStatus', e);
+        }
+      }
+    };
+
     const streamCallback = (type: string, value: any, status?: string) => {
       if (type === 'content') {
         self.content = value ?? '';
         // updateState
       } else if (type === 'state') {
         self.root?.currentBox?.updateState(self.id, value, status);
+      } else if (type === 'status' && status === 'failed') {
+        self.failed = value.info;
       }
+      // console.log('streamCallback', type, value, status);
+      let prevStatus = self.status;
+      self.status = status ?? self.status;
+      handleChangeStatus(prevStatus);
     };
 
     const generateStreaming = flow(function* generateSse(
       streamCallback: (type: string, value: any, status?: string) => void,
     ) {
+      self.failed = null;
       if (self.isProcessing) return;
       self.isProcessing = true;
       const stream = StreamStore.create({

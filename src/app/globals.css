@@ -113,3 +113,14 @@ body {
 /*.g-is-drag .iframe {*/
 /*  pointer-events: none;*/
 /*}*/
+
+.font-tiny {
+  font-size: .68rem;
+  line-height: .9rem;
+  /*letter-spacing: 0.125rem;*/
+  /*font-weight: 500;*/
+}
+
+.main {
+  @apply mx-auto w-full px-2 max-w-6xl py-8;
+}

@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import ChatView from '@/components/box/chat-view';
 import WorkbenchView from '@/components/box/workbench-view';
-import { EyeIcon, HeartIcon } from 'lucide-react';
+import { EllipsisVerticalIcon, EyeIcon, HeartIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import millify from 'millify';
 import LogoBlock from '@/components/common/logo-block';
@@ -12,9 +12,10 @@ import BoxIcon from '@/components/common/box-icon';
 import AuthBlock from '@/components/app/auth-header';
 import { useStores } from '@/hooks/useStores';
 import { generateUuid } from '@/lib/utils';
-import { useDebounceValue, useLocalStorage } from 'usehooks-ts';
+import { useDebounceValue, useLocalStorage, useUnmount } from 'usehooks-ts';
 import { setCookies } from '@/lib/actions/cookies';
 import BaseHeader from '@/components/common/base-header';
+import Link from 'next/link';
 
 const Box = observer(({ data, config }: { data?: any; config?: any }) => {
   const { app } = useStores();
@@ -27,6 +28,11 @@ const Box = observer(({ data, config }: { data?: any; config?: any }) => {
   const isDragging = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  useUnmount(() => {
+    // Cleanup logic here
+    app.currentBox?.clearBox();
+  });
+
   // Populate store from incoming data
   useEffect(() => {
     if (data?.box) {
@@ -37,7 +43,7 @@ const Box = observer(({ data, config }: { data?: any; config?: any }) => {
         });
       }
     }
-  }, [app, data]);
+  }, []);
 
   useEffect(() => {
     isDragging
@@ -86,8 +92,19 @@ const Box = observer(({ data, config }: { data?: any; config?: any }) => {
         <>
           <LogoBlock />
           <BoxIcon />
-          <div className="text-sm">
+          <div className="text-sm flex flex-col">
             {app.currentBox?.name || data?.box?.name}
+            {app.currentBox?.user && (
+              <div className="text-muted-foreground">
+                by{' '}
+                <Link
+                  className="dark:text-white text-black hover:underline"
+                  href={`/@${app.currentBox.user.username}`}
+                >
+                  @{app.currentBox.user.username}
+                </Link>
+              </div>
+            )}
           </div>
           <Button
             variant="ghost"
@@ -102,13 +119,29 @@ const Box = observer(({ data, config }: { data?: any; config?: any }) => {
           <Button
             variant="ghost"
             size="sm"
-            className="justify-start shadow-none"
+            className="justify-start pointer-events-none shadow-none"
           >
             <EyeIcon className="h-4 w-4" />
             <span className="text-xs text-gray-400">
               {millify(app.currentBox?.numLikes || 0)}
             </span>
           </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="justify-start shadow-none"
+          >
+            <EllipsisVerticalIcon className="h-4 w-4" />
+          </Button>
+          {/*{app.currentUser?.id && app.currentUser?.id === app.currentBox?.userId ? <div>*/}
+          {/*  <Button*/}
+          {/*    variant="ghost"*/}
+          {/*    size="sm"*/}
+          {/*    className="justify-start shadow-none"*/}
+          {/*  >*/}
+          {/*    <EllipsisVerticalIcon className="h-4 w-4" />*/}
+          {/*  </Button>*/}
+          {/*</div> : null}*/}
         </>
       </BaseHeader>
 

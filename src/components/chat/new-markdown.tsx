@@ -13,6 +13,7 @@ import {
   remarkPlugins,
 } from '@/lib/llm/utils/markdown';
 import { ArrowRightIcon } from 'lucide-react';
+import ArtifactView from '@/components/box/artifact-view';
 
 // const logger = createScopedLogger('MarkdownComponent');
 
@@ -36,12 +37,7 @@ export const NewMarkdown = memo(
               // logger.error(`Invalid message id ${messageId}`);
             }
 
-            return (
-              <div className="bg-background rounded-md p-2 my-1 w-fit">
-                Show <ArrowRightIcon className="inline-block w-4 h-4" />
-              </div>
-            );
-            // return <Artifact messageId={messageId} />;
+            return <ArtifactView messageId={messageId} />;
           }
 
           return (

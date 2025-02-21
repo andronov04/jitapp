@@ -41,6 +41,7 @@ function PureMultimodalInput({
   messages,
   setMessages,
   append,
+  isBusy,
   handleSubmit,
   className,
 }: {
@@ -49,6 +50,7 @@ function PureMultimodalInput({
   setInput: (value: string) => void;
   isLoading: boolean;
   stop: () => void;
+  isBusy?: boolean;
   attachments: Array<Attachment>;
   setAttachments: Dispatch<SetStateAction<Array<Attachment>>>;
   messages: Array<Message>;
@@ -204,6 +206,7 @@ function PureMultimodalInput({
         className="fixed -top-4 -left-4 size-0.5 opacity-0 pointer-events-none"
         ref={fileInputRef}
         multiple
+        disabled={isBusy}
         onChange={handleFileChange}
         tabIndex={-1}
       />
@@ -232,6 +235,7 @@ function PureMultimodalInput({
         ref={textareaRef}
         placeholder="Send a message..."
         value={input}
+        disabled={isBusy}
         onChange={handleInput}
         className={cn(
           'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base bg-muted pb-10 dark:border-zinc-700',
@@ -261,9 +265,11 @@ function PureMultimodalInput({
 
       <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end">
         {isLoading ? (
-          <StopButton stop={stop} setMessages={setMessages} />
+          <div></div>
+          // <StopButton stop={stop} setMessages={setMessages} />
         ) : (
           <SendButton
+            disabled={isBusy}
             input={input}
             submitForm={submitForm}
             uploadQueue={uploadQueue}
@@ -279,6 +285,7 @@ export const MultimodalInput = memo(
   (prevProps, nextProps) => {
     if (prevProps.input !== nextProps.input) return false;
     if (prevProps.isLoading !== nextProps.isLoading) return false;
+    if (prevProps.isBusy !== nextProps.isBusy) return false;
     if (!equal(prevProps.attachments, nextProps.attachments)) return false;
 
     return true;
@@ -336,9 +343,11 @@ function PureSendButton({
   submitForm,
   input,
   uploadQueue,
+  disabled,
 }: {
   submitForm: () => void;
   input: string;
+  disabled?: boolean;
   uploadQueue: Array<string>;
 }) {
   return (
@@ -348,16 +357,11 @@ function PureSendButton({
         event.preventDefault();
         submitForm();
       }}
-      disabled={input.length === 0 || uploadQueue.length > 0}
+      disabled={disabled || input.length === 0 || uploadQueue.length > 0}
     >
       <ArrowUpIcon size={14} />
     </Button>
   );
 }
 
-const SendButton = memo(PureSendButton, (prevProps, nextProps) => {
-  if (prevProps.uploadQueue.length !== nextProps.uploadQueue.length)
-    return false;
-  if (prevProps.input !== nextProps.input) return false;
-  return true;
-});
+const SendButton = memo(PureSendButton);

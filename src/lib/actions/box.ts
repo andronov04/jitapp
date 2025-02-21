@@ -13,6 +13,7 @@ export async function getBoxStateBySlug(slug: string) {
       id: true,
       slug: true,
       name: true,
+      userId: true,
       // createdAt: true,
     },
   });

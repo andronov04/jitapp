@@ -1,16 +1,8 @@
 import React, { memo } from 'react';
-import { Markdown } from '@/components/chat/markdown';
 import { NewMarkdown } from '@/components/chat/new-markdown';
 
 const NonPreMemoizedMarkdown = ({ content }: { content: string }) => {
   let result: string | any[] = content;
-  // try {
-  //   // result = parseJitMessages(content);
-  //
-  //   // console.log("content", result);
-  // } catch (e) {
-  //   console.log(e);
-  // }
 
   if (Array.isArray(result)) {
     return (

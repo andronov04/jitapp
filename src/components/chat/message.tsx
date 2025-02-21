@@ -30,127 +30,114 @@ import MessageChildren from '@/components/chat/message-children';
 import AvatarBlock from '@/components/common/avatar-block';
 import SparkleIcon from '@/components/common/sparkle-icon';
 import Link from 'next/link';
+import { observer } from 'mobx-react-lite';
 
-const PurePreviewMessage = ({
-  chatId,
-  message,
-  vote,
-  isLoading,
-  setMessages,
-  reload,
-  isReadonly,
-}: {
-  chatId: string;
-  message: IMessageStore;
-  vote: any | undefined;
-  isLoading: boolean;
-  setMessages: (
-    messages: Message[] | ((messages: Message[]) => Message[]),
-  ) => void;
-  reload: (
-    chatRequestOptions?: ChatRequestOptions,
-  ) => Promise<string | null | undefined>;
-  isReadonly: boolean;
-}) => {
-  const [mode, setMode] = useState<'view' | 'edit'>('view');
+export const PreviewMessage = observer(
+  ({
+    chatId,
+    message,
+    vote,
+    isLoading,
+    setMessages,
+    reload,
+    isReadonly,
+  }: {
+    chatId: string;
+    message: IMessageStore;
+    vote: any | undefined;
+    isLoading: boolean;
+    setMessages: (
+      messages: Message[] | ((messages: Message[]) => Message[]),
+    ) => void;
+    reload: (
+      chatRequestOptions?: ChatRequestOptions,
+    ) => Promise<string | null | undefined>;
+    isReadonly: boolean;
+  }) => {
+    const [mode, setMode] = useState<'view' | 'edit'>('view');
 
-  // useEffect(() => {
-  //   console.log('message', message.status, message);
-  // }, [message.status]);
-  console.log(':::MESSAGE:::', message);
+    // useEffect(() => {
+    //   console.log('message', message.status, message);
+    // }, [message.status]);
 
-  return (
-    <AnimatePresence>
-      <motion.div
-        className="w-full mx-auto max-w-3xl px-2 group/message"
-        initial={{ y: 5, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        data-role={message.role}
-      >
-        <div
-          className={cn(
-            'flex gap-4 w-full group-data-[role=user]/message:max-w-2xl',
-            {
-              'w-full': mode === 'edit',
-              'group-data-[role=user]/message:w-fit': mode !== 'edit',
-            },
-          )}
+    return (
+      <AnimatePresence>
+        <motion.div
+          className="w-full mx-auto max-w-3xl px-2 group/message"
+          initial={{ y: 5, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          data-role={message.role}
         >
-          {message.role === 'assistant' && (
-            <div className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background">
-              <div className="translate-y-px">
-                <SparklesIcon size={14} />
-              </div>
-            </div>
-          )}
-
-          <div className="flex flex-col gap-2 w-full">
-            {message.content && message.role === 'user' && (
-              <div className="flex flex-row gap-2 items-start">
-                <Link
-                  target={'_blank'}
-                  className="hover:underline"
-                  href={`/${message.user?.username}`}
-                >
-                  <AvatarBlock id={message.user?.id || message.id} />
-                </Link>
-
-                <div
-                  className={cn('flex flex-col', {
-                    'bg-primary text-primary-foreground px-3 py-2 rounded-xl':
-                      message.role === 'user',
-                  })}
-                >
-                  <div className="text-green-600 font-semibold">
-                    <Link
-                      target={'_blank'}
-                      className="hover:underline"
-                      href={`/${message.user?.username}`}
-                    >
-                      {message.user?.username ?? 'user'}
-                    </Link>
-                  </div>
-                  <PreMarkdown content={message.content as string} />
+          <div
+            className={cn(
+              'flex gap-4 w-full group-data-[role=user]/message:max-w-2xl',
+              {
+                'w-full': mode === 'edit',
+                'animate-pulse': message.status === 'initial',
+                'group-data-[role=user]/message:w-fit': mode !== 'edit',
+              },
+            )}
+          >
+            {message.role === 'assistant' && (
+              <div className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background">
+                <div className="translate-y-px">
+                  <SparklesIcon size={14} />
                 </div>
               </div>
             )}
 
-            {message.role === 'group' && (
-              <div className="rounded-xl flex flex-row gap-2 items-start">
-                <div className="w-8 h-8 flex-none flex items-center justify-center rounded-full bg-secondary">
-                  <SparkleIcon />
-                </div>
-                <div
-                  className={cn(
-                    'flex flex-col divide-y-2 divide-dashed divide-background space-y-2 bg-secondary px-3 py-2 rounded-xl',
-                  )}
-                >
-                  {message.children.map((msg) => (
-                    <div key={msg.id} className="pt-1 first:pt-0">
-                      <div className="text-green-600 font-semibold">
-                        {msg.model?.modelLabel || 'AI'}
-                      </div>
-                      <MessageChildren key={msg.id} message={msg} />
+            <div className="flex flex-col gap-2 w-full">
+              {message.content && message.role === 'user' && (
+                <div className="flex flex-row gap-2 items-start">
+                  <Link
+                    target={'_blank'}
+                    className="hover:underline"
+                    href={`/${message.user?.username}`}
+                  >
+                    <AvatarBlock id={message.user?.id || message.id} />
+                  </Link>
+
+                  <div
+                    className={cn('flex flex-col', {
+                      'bg-primary text-primary-foreground px-3 py-2 rounded-xl':
+                        message.role === 'user',
+                    })}
+                  >
+                    <div className="text-green-600 font-semibold">
+                      <Link
+                        target={'_blank'}
+                        className="hover:underline"
+                        href={`/@${message.user?.username}`}
+                      >
+                        @{message.user?.username ?? 'user'}
+                      </Link>
                     </div>
-                  ))}
+                    <PreMarkdown content={message.content as string} />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+
+              {message.role === 'group' && (
+                <div className="rounded-xl flex flex-row gap-2 items-start">
+                  <div className="w-8 h-8 flex-none flex items-center justify-center rounded-full bg-secondary">
+                    <SparkleIcon />
+                  </div>
+                  <div
+                    className={cn(
+                      'flex flex-col divide-y-2 divide-dashed divide-background space-y-2 bg-secondary px-3 py-2 rounded-xl',
+                    )}
+                  >
+                    {message.children.map((msg) => (
+                      <MessageChildren key={msg.id} message={msg} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </motion.div>
-    </AnimatePresence>
-  );
-};
-
-export const PreviewMessage = memo(
-  PurePreviewMessage,
-  (prevProps, nextProps) => {
-    if (prevProps.isLoading !== nextProps.isLoading) return false;
-    if (prevProps.message.content !== nextProps.message.content) return false;
-    if (!equal(prevProps.vote, nextProps.vote)) return false;
-
-    return true;
+        </motion.div>
+      </AnimatePresence>
+    );
   },
 );
 

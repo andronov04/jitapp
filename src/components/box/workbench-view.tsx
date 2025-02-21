@@ -5,15 +5,23 @@ import { IWorkbenchStore } from '@/lib/store/workbench';
 import { observer } from 'mobx-react-lite';
 import { AnimatePresence, motion } from 'framer-motion';
 import PreviewTool from '@/components/tools/preview-tool';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
 import CodeTool from '@/components/tools/code-tool';
+import { useStores } from '@/hooks/useStores';
+import ModelItem from '@/components/app/model-item';
 
 const WorkbenchView = observer(
   ({ workbench, count }: { workbench: IWorkbenchStore; count: number }) => {
+    const { app } = useStores();
     const [activeTab, setActiveTab] = useState('preview');
     const previewUrl = '';
     // const previewUrl = "https://id-preview--44283e82-135e-4a77-a8d0-871163300657.lovable.app/?forceHideBadge=true";
+    const currentModel = useMemo(
+      () => app.getModelByStateId(workbench.currentState?.id ?? ''),
+      [workbench.currentState?.id],
+    );
+
     return (
       <AnimatePresence>
         <motion.div
@@ -22,34 +30,40 @@ const WorkbenchView = observer(
           animate={{ opacity: 1 }}
         >
           <div
+            data-id={workbench.id}
             key={workbench.id}
             className={cn(
               count > 1
                 ? 'wb-part-min-height wb-part-max-height'
                 : 'wb-full-min-height wb-full-max-height',
-              'h-full  flex flex-col w-full',
+              'h-full  flex workbench flex-col w-full',
             )}
           >
             {/*<div className="px-2 mb-1 font-normal">{workbench.message}</div>*/}
             <div className="bg-secondary flex flex-col overflow-hidden w-full flex-grow rounded-lg">
-              <Tabs
-                onValueChange={setActiveTab}
-                defaultValue={activeTab}
-                className="w-full"
-              >
-                <TabsList>
-                  {workbench.tools?.map((item) => (
-                    <TabsTrigger key={item.id} value={item.id}>
-                      {item.name}
-                    </TabsTrigger>
-                  ))}
-                  {/*<TabsTrigger value="account">Preview</TabsTrigger>*/}
-                  {/*<TabsTrigger value="password">Code</TabsTrigger>*/}
-                  {/*<TabsTrigger value="compiler">Compiler</TabsTrigger>*/}
-                  {/*<TabsTrigger value="graph">Graph</TabsTrigger>*/}
-                  {/*<TabsTrigger value="summary">Summary</TabsTrigger>*/}
-                </TabsList>
-              </Tabs>
+              <div className="flex w-full justify-between items-center">
+                <Tabs
+                  onValueChange={setActiveTab}
+                  defaultValue={activeTab}
+                  className="w-full"
+                >
+                  <TabsList>
+                    {workbench.tools?.map((item) => (
+                      <TabsTrigger key={item.id} value={item.id}>
+                        {item.name}
+                      </TabsTrigger>
+                    ))}
+                    {/*<TabsTrigger value="account">Preview</TabsTrigger>*/}
+                    {/*<TabsTrigger value="password">Code</TabsTrigger>*/}
+                    {/*<TabsTrigger value="compiler">Compiler</TabsTrigger>*/}
+                    {/*<TabsTrigger value="graph">Graph</TabsTrigger>*/}
+                    {/*<TabsTrigger value="summary">Summary</TabsTrigger>*/}
+                  </TabsList>
+                </Tabs>
+                <div className="pr-2">
+                  {currentModel?.id && <ModelItem model={currentModel} />}
+                </div>
+              </div>
 
               <div className="flex-grow w-full flex flex-col flex-nowrap">
                 {workbench.tools?.map((item) => (

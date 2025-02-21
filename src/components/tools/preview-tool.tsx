@@ -20,7 +20,7 @@ const PreviewTool = observer(
     const [hide, setHide] = useState(false);
 
     const url = PREVIEW_URL_TMPL.replace('{uuid}', state?.id ?? '');
-    const isStreaming = status === 'pending';
+    const isStreaming = status === 'streaming';
     return (
       <div className="bg-gray-200 flex-grow flex flex-col h-full w-full dark:bg-gray-800 overflow-hidden">
         {/* Toolbar */}
@@ -83,6 +83,9 @@ const PreviewTool = observer(
             )}
             {!hide ? (
               <iframe
+                // onLoad={(e) => {
+                //   console.log("iframe", e);
+                // }}
                 title="Preview"
                 width="100%"
                 id="iframe_preview"

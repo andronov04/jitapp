@@ -6,6 +6,14 @@ const nextConfig: NextConfig = {
     appIsrStatus: false,
     buildActivity: false,
   },
+  rewrites: async () => {
+    return [
+      {
+        source: '/@:username',
+        destination: '/user/:username',
+      },
+    ];
+  },
 };
 
 export default nextConfig;

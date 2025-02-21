@@ -53,7 +53,7 @@ export async function POST(request: Request) {
           kind: 'user' as any,
           content: input,
           userId: currentUser.id,
-          status: 'created',
+          status: 'completed',
           createdAt: new Date(),
           boxId: boxId,
         },
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
       newMessages.push({
         role: userMessage.role,
         id: userMessage.id,
-        status: 'created',
+        status: 'completed',
       });
     } else {
       const parentMessage = await prisma.message.create({
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
           kind: 'group',
           content: '',
           userId: currentUser.id,
-          status: 'created',
+          status: 'completed',
           createdAt: new Date(),
           boxId: boxId,
         },
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
       newMessages.push({
         role: parentMessage.role,
         id: parentMessage.id,
-        status: 'created',
+        status: 'completed',
         children: message.children.map((child: any) => ({
           id: child.id,
           role: child.role as any,

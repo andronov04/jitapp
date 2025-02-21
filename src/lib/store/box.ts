@@ -11,8 +11,15 @@ import {
 import { values } from 'mobx';
 import { IWorkbenchStore, WorkbenchStore } from '@/lib/store/workbench';
 import { IMessageStore, MessageStore } from '@/lib/store/message';
-import { fetcher, generateUuid } from '@/lib/utils';
+import {
+  fetcher,
+  filterRecursive,
+  findRecursive,
+  generateUuid,
+} from '@/lib/utils';
 import { ToolStore } from '@/lib/store/tool';
+import { toast } from 'sonner';
+import { IUserStore } from '@/lib/store/user';
 
 let boxStore: IBoxStore | undefined;
 
@@ -27,15 +34,27 @@ export const BoxStore = types
     name: types.optional(types.string, ''),
     workbenches: types.array(WorkbenchStore),
     messages: types.array(MessageStore),
+    userId: types.optional(types.string, ''),
     isFirst: types.optional(types.boolean, true),
     numLikes: types.optional(types.number, 0),
     numViews: types.optional(types.number, 0),
-    // isReady
+    isBusy: types.optional(types.boolean, false),
+    failed: types.maybeNull(
+      types.model({
+        message: types.optional(types.string, ''),
+        code: types.union(types.string, types.number),
+      }),
+    ),
   })
   .views((self) => ({
     get getId() {
       return self.originalId || self.id;
     },
+    get user(): IUserStore | null {
+      const root = getRoot<any>(self);
+      return root.users.find((a: any) => a.id === self.userId) ?? null;
+    },
+
     // get statuses() {
     //   return self.messages.map(m => m.status).map(s => ({status: s, count: self.messages.filter(m => m.status === s).length})).sort((a, b) => b.count - a.count);
     // },
@@ -59,6 +78,8 @@ export const BoxStore = types
 
     const createChat = flow(function* createChat(input: string) {
       self.isProcessing = true;
+      self.isBusy = true;
+      self.failed = null;
       const messages = self.messages
         .filter((m) => m.status === 'initial')
         .map((m) => {
@@ -83,10 +104,26 @@ export const BoxStore = types
         boxId: self.getId,
         messages,
       });
+      console.log('createChat', 'data', data, 'error', error);
       if (error) {
-        console.error('createChat', error);
+        console.error('createChat', error.info);
+        self.failed = error.info; // TODO: validate error, if not enough credits
+
+        // failed messages initial to failed
+        const messages = filterRecursive(
+          self.messages,
+          'initial',
+          'status',
+        ) as any[];
+        console.log('createChat', 'messages', messages);
+        for (const message of messages) {
+          message.updateMessage({
+            status: message.role === 'assistant' ? 'cancelled' : 'failed',
+          });
+        }
         return;
       }
+
       self.isFirst = false;
       const { box, messages: newMessages } = data;
       window.history.replaceState({}, '', `/i/${box.slug}`);
@@ -200,6 +237,26 @@ export const BoxStore = types
       Promise.all(tasks);
     };
 
+    const clearBox = () => {
+      self.messages.clear();
+      self.workbenches.clear();
+      self.isProcessing = false;
+      self.isFirst = false;
+      self.failed = null;
+      self.isBusy = false;
+      self.originalId = generateUuid();
+      self.numLikes = 0;
+      self.numViews = 0;
+    };
+
+    const recalculateMsgStatus = () => {
+      // TODO improve this
+      self.isBusy = self.messages
+        .map((a) => [a, ...(a.children || [])])
+        .flat()
+        .some((m) => m.status !== 'completed');
+    };
+
     return {
       addWorkbench,
       startStream,
@@ -207,6 +264,8 @@ export const BoxStore = types
       setProcessing,
       createChat,
       updateState,
+      clearBox,
+      recalculateMsgStatus,
     };
   });
 

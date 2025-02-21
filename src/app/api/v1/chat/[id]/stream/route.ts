@@ -38,9 +38,10 @@ export async function GET(request: Request) {
     return new Response('messageId is required', { status: 400 });
   }
   const msg = await getMessageForStream(messageId);
-  // if (!msg) {
-  //   return new Response("messageId is required", { status: 400 });
-  // }
+  if (!msg) {
+    return new Response('messageId is required', { status: 400 });
+  }
+  // return new Response("test", { status: 400 });
 
   // TODO get history
 
@@ -140,7 +141,7 @@ export async function GET(request: Request) {
               id: messageId,
             },
             data: {
-              status: 'ready',
+              status: 'completed',
               content: contentText,
             },
           });

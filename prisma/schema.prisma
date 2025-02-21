@@ -49,6 +49,7 @@ model iuser {
 
   boxes    box[]
   messages message[]
+  likes    like[]
 
   @@map("iuser")
 }
@@ -64,9 +65,11 @@ model box {
   name        String    @db.VarChar
   searchText  String?   @map("search_text")
   risked      Boolean   @default(false)
+  checked     Boolean   @default(false)
   processing  Boolean   @default(true)
   active      Boolean   @default(true)
   published   Boolean   @default(false)
+  tags        String[]
   featured    Boolean   @default(false)
   order       Decimal   @default(0) @db.Decimal(12, 4)
   description String?
@@ -77,9 +80,14 @@ model box {
   isPrivate   Boolean   @default(false) @map("is_private")
   meta        Json?
 
+  originalBoxId String? @map("original_box_id")
+  originalBox   box?    @relation("box_to_original_table", fields: [originalBoxId], references: [id])
+  descendants   box[]   @relation("box_to_original_table")
+
   userId   String?   @map("user_id")
   user     iuser?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages message[]
+  likes    like[]
 
   @@map("box_table")
 }
@@ -169,4 +177,17 @@ model state {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@map("state_table")
+}
+
+model like {
+  id        Int       @id() @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
+  userId    String    @map("user_id") @db.Uuid
+  boxId     String    @map("box_id") @db.Uuid
+  iuser     iuser     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  box       box       @relation(fields: [boxId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("like")
 }

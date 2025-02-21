@@ -14,7 +14,7 @@ export default function AvatarBlock({
     <Avatar className={className ?? 'w-8 h-8'}>
       <AvatarImage src={customSrc || ''} />
       <AvatarFallback className="rounded-lg">
-        <BoringAvatar.default size={120} name={id as any} />
+        <BoringAvatar.default name={id as any} />
       </AvatarFallback>
       {/*<AvatarFallback>{username.slice(0, 2).toUpperCase()}</AvatarFallback>*/}
     </Avatar>

@@ -20,26 +20,7 @@ import {
 } from '@/components/ui/popover';
 import { useMemo, useState } from 'react';
 import { IModelStore } from '@/lib/store/model';
-
-const ModelItem = ({ model }: { model: IModelStore }) => {
-  return (
-    <div className="flex text-xs flex-col items-start justify-start gap-0.5">
-      <div className="flex flex-row items-center gap-1">
-        <img
-          alt={model.providerKey}
-          width="16"
-          height="16"
-          src={`/icons/${model.providerKey}.svg`}
-          className={cn('selector-model-image dark:invert h-3 w-3')}
-        />
-        <p className=" opacity-50">{model.providerLabel}</p>
-      </div>
-      <div className="text-left flex flex-col">
-        <p>{model.modelLabel}</p>
-      </div>
-    </div>
-  );
-};
+import ModelItem from '@/components/app/model-item';
 
 const ModelSelector = observer(() => {
   const { app } = useStores();

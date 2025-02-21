@@ -34,6 +34,7 @@ export const Messages = observer(
     const [messagesContainerRef, messagesEndRef] =
       useScrollToBottom<HTMLDivElement>();
 
+    console.log('messages', messages);
     return (
       <div
         ref={messagesContainerRef}
@@ -43,8 +44,6 @@ export const Messages = observer(
 
         {messages.map((message, index) => (
           <div key={message.id}>
-            {/*<p>{message.id}</p>*/}
-            {/*<pre>{JSON.stringify(message.content ?? {})}</pre>*/}
             <PreviewMessage
               key={message.id}
               chatId={chatId}

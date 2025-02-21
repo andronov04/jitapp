@@ -48,7 +48,10 @@ export function sanitizeUIMessages(messages: Array<Message>): Array<Message> {
 }
 
 interface ApplicationError extends Error {
-  info: string;
+  info: {
+    code: string | number;
+    message: string;
+  };
   status: number;
 }
 
@@ -58,6 +61,23 @@ export const generateId = () => {
 
 export const generateUuid = () => {
   return uuidv4();
+};
+
+export const createFetchError = async (res: Response) => {
+  const error = new Error(
+    'An error occurred while fetching the data.',
+  ) as ApplicationError;
+
+  try {
+    error.info = await res.clone().json();
+  } catch (e) {
+    error.info = {
+      code: res.status,
+      message: await res.text(),
+    };
+  }
+  error.status = res.status;
+  return error;
 };
 
 export const fetcher = async (
@@ -73,13 +93,7 @@ export const fetcher = async (
   });
 
   if (!res.ok) {
-    const error = new Error(
-      'An error occurred while fetching the data.',
-    ) as ApplicationError;
-
-    error.info = await res.json();
-    error.status = res.status;
-
+    const error = await createFetchError(res);
     // throw error;
     return {
       data: null,
@@ -223,3 +237,54 @@ export function getMessageIdFromAnnotations(message: Message) {
 export const isAdmin = (email?: string) => {
   return ['andron.andr@gmail.com', 'ndrnv4@gmail.com'].includes(email ?? '');
 };
+
+type AnyRecord = {
+  [key: string]: any;
+};
+
+export function findRecursive<T extends AnyRecord>(
+  items: T[],
+  targetValue: any,
+  idKey: string = 'id',
+  childrenKey: string = 'children',
+): T | undefined {
+  for (const item of items) {
+    if (item[idKey] === targetValue) {
+      return item;
+    }
+
+    const children = item[childrenKey];
+    if (Array.isArray(children)) {
+      const found = findRecursive(children, targetValue, idKey, childrenKey);
+      if (found) {
+        return found;
+      }
+    }
+  }
+  return undefined;
+}
+
+export function filterRecursive<T extends AnyRecord>(
+  items: T[],
+  targetValue: any,
+  idKey: string = 'id',
+  childrenKey: string = 'children',
+): T[] {
+  let results: T[] = [];
+
+  for (const item of items) {
+    if (item[idKey] === targetValue) {
+      results.push(item);
+    }
+
+    const children = item[childrenKey];
+    if (Array.isArray(children)) {
+      // Рекурсивно фильтруем вложенные элементы и добавляем их в общий список
+      results = results.concat(
+        filterRecursive(children, targetValue, idKey, childrenKey),
+      );
+    }
+  }
+
+  return results;
+}

@@ -65,30 +65,6 @@ const ChatView = observer(
         <FormView id={id} />
       </div>
     );
-
-    // return (
-    //   <div
-    //     style={{
-    //       width: 'inherit',
-    //       maxHeight: 'calc(100vh - 3rem)',
-    //     }}
-    //     className="flex flex-col h-full fixed bottom-0"
-    //   >
-    //     <div className="flex-1 flex flex-col min-w-0 gap-4 px-2 overflow-y-scroll pt-4">
-    //       {topLevelMessages.map((message) => (
-    //         <Message key={message.id} message={message} />
-    //       ))}
-    //     </div>
-    //
-    //     <div className="p-4">
-    //       <textarea
-    //         className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-    //         placeholder="Type your message..."
-    //         rows={3}
-    //       />
-    //     </div>
-    //   </div>
-    // );
   },
 );
 

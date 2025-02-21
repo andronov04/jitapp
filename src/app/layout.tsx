@@ -9,6 +9,7 @@ import { StoreWrapper } from '@/lib/providers/store-provider';
 import { getModels } from '@/lib/actions/model';
 import { ReactScan } from '@/app/ReactScan';
 import { auth } from '@/lib/actions/auth';
+import NextTopLoader from 'nextjs-toploader';
 import { getSimpleGenerators } from '@/lib/actions/generator';
 
 const roboto = Roboto({
@@ -74,6 +75,7 @@ export default async function RootLayout({
           'bg-background min-h-screen font-sans antialiased',
         )}
       >
+        <NextTopLoader color="black" showSpinner={false} height={2} />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
